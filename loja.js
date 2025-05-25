@@ -6,27 +6,22 @@ let estoqueBala = 200;
 
 // Função para verificar se o usuário está logado
 function verificarLogin() {
-    const user = firebase.auth().currentUser;
+    const usuarioLogado = localStorage.getItem("usuario_logado");
 
-    if (!user) {
+    if (!usuarioLogado) {
         alert("Você precisa estar logado!");
-        window.location.href = "index.html";  // Se não estiver logado, redireciona para o login
+        window.location.href = "login.html";  // Se não estiver logado, redireciona para o login
     } else {
-        document.getElementById("nome-usuario").innerText = user.email;
+        document.getElementById("nome-usuario").innerText = usuarioLogado;
         carregarEstado();
     }
 }
 
 // Função de logout
-async function logout() {
-    try {
-        await firebase.auth().signOut();
-        alert("Logout bem-sucedido!");
-        localStorage.removeItem("usuario_logado");
-        window.location.href = "index.html";  // Redireciona para o login
-    } catch (error) {
-        alert("Erro ao sair: " + error.message);
-    }
+function logout() {
+    localStorage.removeItem("usuario_logado");
+    alert("Logout bem-sucedido!");
+    window.location.href = "login.html";  // Redireciona para o login
 }
 
 window.onload = verificarLogin;

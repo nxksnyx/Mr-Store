@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MrStore - Cadastro / Login</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f0f0f0; }
+    .form-container { padding: 20px; background-color: #fff; width: 300px; margin: auto; border-radius: 8px; }
+    input, button { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
+    button { background-color: #FFD700; color: black; cursor: pointer; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="form-container" id="auth-container">
+    <h2 id="form-title">Cadastro</h2>
+    <input type="email" id="auth-username" placeholder="E-mail" />
+    <input type="password" id="auth-password" placeholder="Senha" />
+    <button onclick="processarAuth()">Cadastrar</button>
+    <p>Já tem uma conta? <a onclick="toggleForm()">Fazer login</a></p>
+  </div>
+
+  <script>
+    async function processarAuth() {
+      const username = document.getElementById('auth-username').value;
+      const password = document.getElementById('auth-password').value;
+
+      // Verificar e-mail e senha
+      if (!username || !password) {
+        alert("Preencha todos os campos.");
+        return;
+      }
+
+      const formTitle = document.getElementById('form-title').innerText;
+
+      if (formTitle === "Cadastro") {
+        await cadastrarUsuario(username, password);
+      } else {
+        await fazerLogin(username, password);
+      }
+    }
+
+    // Função de cadastro
+    async function cadastrarUsuario(username, password) {
+      const response = await fetch('http://localhost:5000/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: username, password })
+      });
+
+      const result = await response.text();
+      alert(result);
+      if (response.status === 201) window.location.href = "loja.html";
+    }
+
+    // Função de login
+    async function fazerLogin(username, password) {
+      const response = await fetch('http://localhost:5000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: username, password })
+      });
+
+      const result = await response.json();
+      if (response.status === 200) {
+        localStorage.setItem('auth_token', result.token);
+        window.location.href = "loja.html";
+      } else {
+        alert(result);
+      }
+    }
+
+    // Alternar entre cadastro e login
+    function toggleForm() {
+      const formTitle = document.getElementById('form-title');
+      const authButton = document.querySelector('button');
+      const actionText = document.querySelector('p a');
+
+      if (formTitle.innerText === "Cadastro") {
+        formTitle.innerText = "Login";
+        authButton.innerText = "Entrar";
+        actionText.innerText = "Cadastrar";
+      } else {
+        formTitle.innerText = "Cadastro";
+        authButton.innerText = "Cadastrar";
+        actionText.innerText = "Fazer login";
+      }
+    }
+  </script>
+</body>
+</html>
