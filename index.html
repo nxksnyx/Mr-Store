@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MrStore - Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url('https://i.imgur.com/sI8LmKe.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      min-height: 100vh;
+      margin: 0;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: white;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header img {
+      width: 120px;
+    }
+
+    .form-container {
+      background-color: rgba(0, 0, 0, 0.75);
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .form-container h2 {
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #999;
+      border-radius: 6px;
+      background-color: #222;
+      color: white;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #FFD700;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    p {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    a {
+      color: #FFD700;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Bem-vindo à MrStore!</h1>
+    <img src="https://i.imgur.com/9Thbwqj.png" alt="Logo">
+  </div>
+
+  <!-- Login -->
+  <div class="form-container" id="login-container">
+    <h2>Login</h2>
+    <input type="text" id="login-username" placeholder="Nome de usuário">
+    <input type="password" id="login-password" placeholder="Senha">
+    <button onclick="fazerLogin()">Entrar</button>
+    <p>Não tem uma conta? <a onclick="mostrarCadastro()">Cadastre-se</a></p>
+  </div>
+
+  <!-- Cadastro -->
+  <div class="form-container" id="cadastro-container" style="display: none;">
+    <h2>Cadastro</h2>
+    <input type="text" id="cadastro-username" placeholder="Nome de usuário">
+    <input type="password" id="cadastro-password" placeholder="Senha">
+    <button onclick="fazerCadastro()">Cadastrar</button>
+    <p>Já tem uma conta? <a onclick="mostrarLogin()">Fazer login</a></p>
+  </div>
+
+  <script>
+    // Funções de login e cadastro
+    function mostrarCadastro() {
+        document.getElementById('cadastro-container').style.display = 'block';
+        document.getElementById('login-container').style.display = 'none';
+    }
+
+    function mostrarLogin() {
+        document.getElementById('cadastro-container').style.display = 'none';
+        document.getElementById('login-container').style.display = 'block';
+    }
+
+    function fazerLogin() {
+        const username = document.getElementById('login-username').value;
+        const password = document.getElementById('login-password').value;
+        const usuario = JSON.parse(localStorage.getItem(username));
+
+        if (usuario && usuario.senha === password) {
+            alert("Login bem-sucedido!");
+            localStorage.setItem("usuario_logado", username);
+            window.location.href = "loja.html";
+        } else {
+            alert("Usuário ou senha incorretos!");
+        }
+    }
+
+    function fazerCadastro() {
+        const username = document.getElementById('cadastro-username').value;
+        const password = document.getElementById('cadastro-password').value;
+
+        if (localStorage.getItem(username)) {
+            alert("Usuário já existe. Tente outro nome.");
+            return;
+        }
+
+        const novoUsuario = {
+            username: username,
+            senha: password
+        };
+
+        localStorage.setItem(username, JSON.stringify(novoUsuario));
+        alert("Cadastro realizado com sucesso!");
+        localStorage.setItem("usuario_logado", username);
+        window.location.href = "loja.html";
+    }
+  </script>
+</body>
+</html>
