@@ -131,43 +131,52 @@
 
     // Função de cadastro
     function cadastrarUsuario(username, password) {
-      const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
-      
-      // Verificando se o usuário já existe
-      const usuarioExistente = usuarios.find(user => user.email === username);
-      if (usuarioExistente) {
-        alert("Este e-mail já está cadastrado.");
-        return;
-      }
-
-      // Salvando o novo usuário
-      usuarios.push({ email: username, password });
-      localStorage.setItem("usuarios", JSON.stringify(usuarios));
-
-      alert("Cadastro realizado com sucesso!");
-      window.location.href = "loja.html";  // Redireciona para a página da loja
+      fetch('https://seu-servidor-backend.com/cadastro', {  // URL do backend
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: username, senha: password }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.message === "Cadastro realizado com sucesso!") {
+          alert("Cadastro realizado com sucesso!");
+          window.location.href = "loja.html";  // Redireciona para a página da loja
+        } else {
+          alert(data.message);  // Exibe a mensagem de erro
+        }
+      })
+      .catch(error => {
+        console.error("Erro ao cadastrar:", error);
+        alert("Ocorreu um erro. Tente novamente.");
+      });
     }
 
-    // Função de login
-    function fazerLogin(username, password) {
-      const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
-      const usuario = usuarios.find(user => user.email === username);
-
-      if (!usuario) {
-        alert("Usuário não encontrado.");
-        return;
-      }
-
-      if (usuario.password !== password) {
-        alert("Senha incorreta.");
-        return;
-      }
-
-      // Login bem-sucedido
-      localStorage.setItem("usuario_logado", usuario.email);
+// Função de login
+function fazerLogin(username, password) {
+  fetch('http://localhost:5000/login', {  // Substitua aqui pela URL do seu backend real
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email: username, senha: password }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.message === "Login bem-sucedido!") {
       alert("Login bem-sucedido!");
       window.location.href = "loja.html";  // Redireciona para a página da loja
+    } else {
+      alert(data.message);  // Exibe a mensagem de erro
     }
+  })
+  .catch(error => {
+    console.error("Erro ao logar:", error);
+    alert("Ocorreu um erro. Tente novamente.");
+  });
+}
+
   </script>
 </body>
 </html>
