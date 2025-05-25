@@ -90,7 +90,6 @@ function logout() {
     window.location.href = "index.html";
 }
 
-
 window.onload = () => {
     const user = getCookie("usuario_logado");
     if (!user) {
