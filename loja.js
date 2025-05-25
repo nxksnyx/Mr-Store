@@ -37,7 +37,6 @@ function comprarProduto(preco, tipo) {
         return;
     }
 
-    // Atualizar o estoque global no localStorage
     switch (tipo) {
         case 'bola':
             if (estoqueBola <= 0) return alert("Produto fora de estoque!");
@@ -63,7 +62,7 @@ function comprarProduto(preco, tipo) {
 
     moedas -= preco;
     atualizarTotal();
-    salvarEstado(); // Salvar a mudança no localStorage
+    salvarEstado(); 
     alert("Compra realizada com sucesso!");
 }
 

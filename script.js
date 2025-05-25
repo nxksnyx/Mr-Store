@@ -1,13 +1,16 @@
+// Exibir a tela de cadastro
 function mostrarCadastro() {
     document.getElementById('cadastro-container').style.display = 'block';
     document.getElementById('login-container').style.display = 'none';
 }
 
+// Exibir a tela de login
 function mostrarLogin() {
     document.getElementById('cadastro-container').style.display = 'none';
     document.getElementById('login-container').style.display = 'block';
 }
 
+// Fazer login do usuário
 function fazerLogin() {
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
@@ -22,6 +25,7 @@ function fazerLogin() {
     }
 }
 
+// Fazer cadastro de um novo usuário
 function fazerCadastro() {
     const username = document.getElementById('cadastro-username').value;
     const password = document.getElementById('cadastro-password').value;
