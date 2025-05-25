@@ -164,16 +164,17 @@
     }
 
     // Verificar se já existe um usuário logado
-    window.onload = () => {
-      const user = getCookie("usuario_logado");
-      if (!user) {
+   window.onload = () => {
+    const user = getCookie("usuario_logado");
+    if (!user) {
         // Se não tiver cookie de login, exibe a tela de login
         alert("Você precisa estar logado!");
-      } else {
+    } else {
         // Se tiver o cookie, redireciona para a loja
         window.location.href = "loja.html";
-      }
-    };
+    }
+};
+
   </script>
 
 </body>
