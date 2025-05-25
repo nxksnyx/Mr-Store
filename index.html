@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MrStore - Login</title>
+  <title>MrStore - Cadastro</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -63,7 +63,7 @@
     }
 
     .header img {
-      width: 150px; /* Tamanho da imagem ajustado */
+      width: 150px;
       margin-top: 10px;
     }
   </style>
@@ -74,90 +74,70 @@
     <img src="https://i.imgur.com/9Thbwqj.png" alt="Logo">
   </div>
 
-  <!-- Login -->
-  <div class="form-container" id="login-container">
-    <h2>Login</h2>
-    <input type="email" id="login-username" placeholder="Email">
-    <input type="password" id="login-password" placeholder="Senha">
-    <button onclick="fazerLogin()">Entrar</button>
-    <p>Não tem uma conta? <a onclick="mostrarCadastro()">Cadastre-se</a></p>
-  </div>
-
   <!-- Cadastro -->
-  <div class="form-container" id="cadastro-container" style="display: none;">
+  <div class="form-container" id="cadastro-container">
     <h2>Cadastro</h2>
-    <input type="email" id="cadastro-username" placeholder="Email">
-    <input type="password" id="cadastro-password" placeholder="Senha">
+    <input type="email" id="cadastro-username" placeholder="E-mail" />
+    <input type="password" id="cadastro-password" placeholder="Senha" />
     <button onclick="fazerCadastro()">Cadastrar</button>
     <p>Já tem uma conta? <a onclick="mostrarLogin()">Fazer login</a></p>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"></script>
+  <!-- Firebase App (SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
   <script>
     // Configuração do Firebase
     const firebaseConfig = {
-      apiKey: "AIzaSyBJvwszc3_gEowkBIGDuOqexGVoF6ugYCs",
-      authDomain: "mr-shop-99aa5.firebaseapp.com",
-      projectId: "mr-shop-99aa5",
-      storageBucket: "mr-shop-99aa5.firebasestorage.app",
-      messagingSenderId: "864699611942",
-      appId: "1:864699611942:web:729f0742cc6be5132f9fe7"
+      apiKey: "AIzaSyBJvwszc3_gEowkBIGDuOqexGVoF6ugYCs",  // Verifique se está correto
+      authDomain: "https://nxksnyx-github-io.vercel.app/",  // Certifique-se de que o domínio está correto
+      projectId: "mr-shop-99aa5",  // Projeto ID
+      storageBucket: "mr-shop-99aa5.firebasestorage.app",  // Verifique o bucket de armazenamento
+      messagingSenderId: "864699611942",  // Verifique o ID do sender
+      appId: "1:864699611942:web:729f0742cc6be5132f9fe7"  // Verifique o App ID
     };
 
-    // Inicializa o Firebase
-    const app = firebase.initializeApp(firebaseConfig);
+    // Inicializar o Firebase
+    firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // Funções de Navegação
-    function mostrarCadastro() {
-      document.getElementById('cadastro-container').style.display = 'block';
-      document.getElementById('login-container').style.display = 'none';
-    }
-
+    // Função para mostrar a tela de login
     function mostrarLogin() {
-      document.getElementById('cadastro-container').style.display = 'none';
-      document.getElementById('login-container').style.display = 'block';
+      window.location.href = "index.html";  // Redireciona para a tela de login
     }
 
-    // Verifica se o usuário está logado ao carregar a página
-    window.onload = () => {
-      const user = firebase.auth().currentUser;
-      if (user) {
-        window.location.href = "loja.html";
-      }
-    };
-
-    // Login com Firebase
-    async function fazerLogin() {
-      const username = document.getElementById('login-username').value;
-      const password = document.getElementById('login-password').value;
-
-      try {
-        const userCredential = await auth.signInWithEmailAndPassword(username, password);
-        alert("Login bem-sucedido!");
-        localStorage.setItem("usuario_logado", userCredential.user.email);
-        window.location.href = "loja.html";
-      } catch (error) {
-        alert("Erro: " + error.message);
-      }
-    }
-
-    // Cadastro com Firebase
-    async function fazerCadastro() {
+    // Função de cadastro com Firebase
+    function fazerCadastro() {
       const username = document.getElementById('cadastro-username').value;
       const password = document.getElementById('cadastro-password').value;
 
-      try {
-        const userCredential = await auth.createUserWithEmailAndPassword(username, password);
-        alert("Cadastro realizado com sucesso!");
-        localStorage.setItem("usuario_logado", userCredential.user.email);
-        window.location.href = "loja.html";
-      } catch (error) {
-        alert("Erro: " + error.message);
+      // Verificando o formato do e-mail
+      if (!username || !username.includes('@') || !username.includes('.')) {
+        alert("Por favor, insira um e-mail válido.");
+        return;
       }
+
+      // Verificando o tamanho da senha
+      if (password.length < 6) {
+        alert("A senha deve ter pelo menos 6 caracteres.");
+        return;
+      }
+
+      // Criar usuário com Firebase Authentication
+      auth.createUserWithEmailAndPassword(username, password)
+        .then((userCredential) => {
+          alert("Cadastro realizado com sucesso!");
+          const user = userCredential.user;
+          localStorage.setItem("usuario_logado", user.email);
+          window.location.href = "loja.html";  // Redireciona para a página de loja
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.error("Erro: " + errorMessage);
+          alert("Erro ao cadastrar. Tente novamente.");
+        });
     }
   </script>
 </body>
