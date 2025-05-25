@@ -76,7 +76,86 @@
       font-weight: bold;
     }
   </style>
-  <script src="script.js"></script>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    // Importar as funções necessárias do SDK do Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+
+    // Configuração do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCh9xX0Py_J6xiCOxEGnZS0Pwnha8OZwmw",
+      authDomain: "mrstore-6b888.firebaseapp.com",
+      projectId: "mrstore-6b888",
+      storageBucket: "mrstore-6b888.firebasestorage.app",
+      messagingSenderId: "387627289090",
+      appId: "1:387627289090:web:da4ca1f58ad9ce0354b51b"
+    };
+
+    // Inicializar o Firebase
+    const app = initializeApp(firebaseConfig);
+    
+    // Inicializar os serviços do Firebase
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+
+    // Funções de login e cadastro com Firebase
+    function fazerLogin() {
+      const username = document.getElementById('login-username').value;
+      const password = document.getElementById('login-password').value;
+
+      const userRef = ref(database, 'usuarios/' + username);
+      get(userRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          const usuario = snapshot.val();
+          if (usuario.senha === password) {
+            alert("Login bem-sucedido!");
+            localStorage.setItem("usuario_logado", username);
+            window.location.href = "loja.html";
+          } else {
+            alert("Senha incorreta!");
+          }
+        } else {
+          alert("Usuário não encontrado!");
+        }
+      }).catch((error) => {
+        console.error("Erro ao tentar fazer login:", error);
+      });
+    }
+
+    function fazerCadastro() {
+      const username = document.getElementById('cadastro-username').value;
+      const password = document.getElementById('cadastro-password').value;
+
+      const userRef = ref(database, 'usuarios/' + username);
+      get(userRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          alert("Usuário já existe. Tente outro nome.");
+          return;
+        }
+
+        const novoUsuario = {
+          username: username,
+          senha: password
+        };
+
+        // Salvar no banco de dados do Firebase
+        set(userRef, novoUsuario).then(() => {
+          alert("Cadastro realizado com sucesso!");
+          localStorage.setItem("usuario_logado", username);
+          window.location.href = "loja.html";
+        }).catch((error) => {
+          console.error("Erro ao salvar usuário:", error);
+          alert("Erro ao cadastrar usuário.");
+        });
+      }).catch((error) => {
+        console.error("Erro ao verificar usuário:", error);
+      });
+    }
+  </script>
+
 </head>
 <body>
   <div class="header">
@@ -101,5 +180,18 @@
     <button onclick="fazerCadastro()">Cadastrar</button>
     <p>Já tem uma conta? <a onclick="mostrarLogin()">Fazer login</a></p>
   </div>
+
+  <script>
+    // Função para alternar entre a tela de login e cadastro
+    function mostrarCadastro() {
+      document.getElementById('cadastro-container').style.display = 'block';
+      document.getElementById('login-container').style.display = 'none';
+    }
+
+    function mostrarLogin() {
+      document.getElementById('cadastro-container').style.display = 'none';
+      document.getElementById('login-container').style.display = 'block';
+    }
+  </script>
 </body>
 </html>
