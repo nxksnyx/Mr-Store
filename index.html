@@ -69,7 +69,25 @@
   </style>
 </head>
 <body>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBJvwszc3_gEowkBIGDuOqexGVoF6ugYCs",
+    authDomain: "mr-shop-99aa5.firebaseapp.com",
+    projectId: "mr-shop-99aa5",
+    storageBucket: "mr-shop-99aa5.firebasestorage.app",
+    messagingSenderId: "864699611942",
+    appId: "1:864699611942:web:729f0742cc6be5132f9fe7"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
   <div class="header">
     <h1>Bem-vindo à MrStore!</h1>
     <img src="https://i.imgur.com/9Thbwqj.png" alt="Logo">
@@ -161,7 +179,29 @@
         localStorage.setItem("usuario_logado", username);
         window.location.href = "loja.html"; // Redireciona para a página de loja
     }
-  </script>
+ <!-- Firebase App (SDK) -->
+<script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
+
+<!-- Firebase Authentication -->
+<script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"></script>
+
+<!-- Firebase Firestore (se você for usar o banco de dados) -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBJvwszc3_gEowkBIGDuOqexGVoF6ugYCs",
+    authDomain: "mr-shop-99aa5.firebaseapp.com",
+    projectId: "mr-shop-99aa5",
+    storageBucket: "mr-shop-99aa5.firebasestorage.app",
+    messagingSenderId: "864699611942",
+    appId: "1:864699611942:web:729f0742cc6be5132f9fe7"
+  };
+
+  // Initialize Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+</script>
 
 </body>
 </html>
