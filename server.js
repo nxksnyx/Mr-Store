@@ -1,80 +1,82 @@
+// Importando as dependências
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const bcrypt = require('bcryptjs');
-const cors = require('cors');  // Importando o CORS
+const cors = require('cors');
+const dotenv = require('dotenv');
 
-// Conectando ao MongoDB
-mongoose.connect('mongodb://localhost:27017/mrstore', { useNewUrlParser: true, useUnifiedTopology: true })
+// Carregando as variáveis de ambiente do arquivo .env
+dotenv.config();
+
+// Criando a aplicação Express
+const app = express();
+
+// Usando o middleware CORS para permitir requisições do seu frontend
+app.use(cors({
+  origin: 'https://nxksnyx-github-io.vercel.app', // Altere conforme necessário para o seu frontend
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+}));
+
+// Usando o middleware para interpretar requisições JSON
+app.use(express.json());
+
+// Conectando ao banco de dados MongoDB
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Conectado ao MongoDB'))
   .catch(err => console.log('Erro ao conectar ao MongoDB:', err));
 
-const app = express();
-app.use(bodyParser.json());  // Middleware para lidar com JSON no corpo da requisição
+// Definindo o modelo de usuário
+const Usuario = mongoose.model('Usuario', new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+}));
 
-// Configuração do CORS - permite requisições de seu frontend no GitHub
-const corsOptions = {
-  origin: 'https://nxksnyx-github-io.vercel.app',  // Coloque aqui o domínio do seu frontend
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type'],
-};
-
-app.use(cors(corsOptions));  // Usando o CORS no servidor
-
-// Definição do schema do usuário
-const usuarioSchema = new mongoose.Schema({
-  email: String,
-  senha: String,
-});
-
-const Usuario = mongoose.model('Usuario', usuarioSchema);
-
-// Rota para cadastro de usuário
+// Rota para o cadastro de usuário
 app.post('/cadastro', async (req, res) => {
-  const { email, senha } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  if (!email || !senha) {
-    return res.status(400).json({ message: "E-mail e senha são obrigatórios." });
+    // Verificar se o e-mail já está cadastrado
+    const usuarioExistente = await Usuario.findOne({ email });
+    if (usuarioExistente) {
+      return res.status(400).json({ error: 'Este e-mail já está cadastrado.' });
+    }
+
+    // Criando um novo usuário
+    const novoUsuario = new Usuario({ email, password });
+    await novoUsuario.save();
+
+    return res.status(201).json({ message: 'Cadastro realizado com sucesso!' });
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao cadastrar o usuário.', details: error.message });
   }
-
-  // Verifica se o usuário já existe
-  const usuarioExistente = await Usuario.findOne({ email });
-  if (usuarioExistente) {
-    return res.status(400).json({ message: "Este e-mail já está cadastrado." });
-  }
-
-  // Criptografa a senha
-  const senhaCriptografada = await bcrypt.hash(senha, 10);
-
-  // Cria o novo usuário
-  const novoUsuario = new Usuario({ email, senha: senhaCriptografada });
-  await novoUsuario.save();
-
-  res.status(201).json({ message: "Cadastro bem-sucedido!" });
 });
 
-// Rota para login de usuário
+// Rota para o login do usuário
 app.post('/login', async (req, res) => {
-  const { email, senha } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  if (!email || !senha) {
-    return res.status(400).json({ message: "E-mail e senha são obrigatórios." });
+    // Verificando se o usuário existe
+    const usuario = await Usuario.findOne({ email });
+    if (!usuario) {
+      return res.status(400).json({ error: 'Usuário não encontrado.' });
+    }
+
+    // Verificando a senha
+    if (usuario.password !== password) {
+      return res.status(400).json({ error: 'Senha incorreta.' });
+    }
+
+    // Login bem-sucedido
+    return res.status(200).json({ message: 'Login bem-sucedido!' });
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao fazer login.', details: error.message });
   }
-
-  const usuario = await Usuario.findOne({ email });
-  if (!usuario) {
-    return res.status(400).json({ message: "Usuário não encontrado." });
-  }
-
-  const senhaValida = await bcrypt.compare(senha, usuario.senha);
-  if (!senhaValida) {
-    return res.status(400).json({ message: "Senha incorreta." });
-  }
-
-  res.json({ message: "Login bem-sucedido!" });
 });
 
-// Inicia o servidor na porta 5000
-app.listen(5000, () => {
-  console.log('Servidor rodando na porta 5000');
+// Definindo a porta em que o servidor irá rodar
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
