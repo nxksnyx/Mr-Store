@@ -1,145 +1,83 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MrStore - Login</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-image: url('https://i.imgur.com/sI8LmKe.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      min-height: 100vh;
-      margin: 0;
-      padding: 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: white;
-    }
+let moedas = 0;
+let estoqueBola = 1;
+let estoqueAula = 100;
+let estoqueDias = 50;
+let estoqueBala = 200;
 
-    .header {
-      text-align: center;
-    }
+function carregarEstado() {
+    estoqueBola = parseInt(localStorage.getItem("estoqueBola")) || 1;
+    estoqueAula = parseInt(localStorage.getItem("estoqueAula")) || 100;
+    estoqueDias = parseInt(localStorage.getItem("estoqueDias")) || 50;
+    estoqueBala = parseInt(localStorage.getItem("estoqueBala")) || 200;
+    moedas = parseInt(localStorage.getItem("moedas")) || 0;
+    atualizarTotal();
+}
 
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-    }
+function salvarEstado() {
+    localStorage.setItem("moedas", moedas);
+    localStorage.setItem("estoqueBola", estoqueBola);
+    localStorage.setItem("estoqueAula", estoqueAula);
+    localStorage.setItem("estoqueDias", estoqueDias);
+    localStorage.setItem("estoqueBala", estoqueBala);
+}
 
-    .form-container {
-      background: rgba(0, 0, 0, 0.7);
-      padding: 20px;
-      border-radius: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 300px;
-    }
+function atualizarTotal() {
+    document.getElementById('total-moedas').innerText = moedas;
+}
 
-    input {
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-    }
+function ganharMoeda() {
+    moedas += 1;
+    atualizarTotal();
+    salvarEstado();
+}
 
-    button {
-      background-color: #FFD700;
-      color: black;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-
-    a {
-      color: #FFD700;
-      cursor: pointer;
-    }
-
-    .header img {
-      width: 150px; /* Tamanho da imagem ajustado */
-      margin-top: 10px;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="header">
-    <h1>Bem-vindo à MrStore!</h1>
-    <img src="https://i.imgur.com/9Thbwqj.png" alt="Logo">
-  </div>
-
-  <!-- Login -->
-  <div class="form-container" id="login-container">
-    <h2>Login</h2>
-    <input type="text" id="login-username" placeholder="Nome de usuário">
-    <input type="password" id="login-password" placeholder="Senha">
-    <button onclick="fazerLogin()">Entrar</button>
-    <p>Não tem uma conta? <a onclick="mostrarCadastro()">Cadastre-se</a></p>
-  </div>
-
-  <!-- Cadastro -->
-  <div class="form-container" id="cadastro-container" style="display: none;">
-    <h2>Cadastro</h2>
-    <input type="text" id="cadastro-username" placeholder="Nome de usuário">
-    <input type="password" id="cadastro-password" placeholder="Senha">
-    <button onclick="fazerCadastro()">Cadastrar</button>
-    <p>Já tem uma conta? <a onclick="mostrarLogin()">Fazer login</a></p>
-  </div>
-
-  <script>
-    // Funções de login e cadastro (sem Firebase)
-    function mostrarCadastro() {
-      document.getElementById('cadastro-container').style.display = 'block';
-      document.getElementById('login-container').style.display = 'none';
-    }
-
-    function mostrarLogin() {
-      document.getElementById('cadastro-container').style.display = 'none';
-      document.getElementById('login-container').style.display = 'block';
-    }
-
-    function fazerLogin() {
-      const username = document.getElementById('login-username').value;
-      const password = document.getElementById('login-password').value;
-
-      const usuario = JSON.parse(localStorage.getItem(username));
-
-      if (usuario && usuario.senha === password) {
-        alert("Login bem-sucedido!");
-        localStorage.setItem("usuario_logado", username);
-        window.location.href = "loja.html"; // Redirecionar para a página de loja
-      } else {
-        alert("Usuário ou senha incorretos!");
-      }
-    }
-
-    function fazerCadastro() {
-      const username = document.getElementById('cadastro-username').value;
-      const password = document.getElementById('cadastro-password').value;
-
-      if (localStorage.getItem(username)) {
-        alert("Usuário já existe. Tente outro nome.");
+function comprarProduto(preco, tipo) {
+    if (moedas < preco) {
+        alert("Você não tem Mrcoin suficiente!");
         return;
-      }
-
-      const novoUsuario = {
-        username: username,
-        senha: password
-      };
-
-      localStorage.setItem(username, JSON.stringify(novoUsuario));
-      alert("Cadastro realizado com sucesso!");
-      localStorage.setItem("usuario_logado", username);
-      window.location.href = "loja.html"; // Redirecionar para a página de loja
     }
-  </script>
 
-</body>
-</html>
+    switch (tipo) {
+        case 'bola':
+            if (estoqueBola <= 0) return alert("Produto fora de estoque!");
+            estoqueBola--;
+            document.getElementById('estoque-bola').innerText = "Estoque: " + estoqueBola;
+            break;
+        case 'aula':
+            if (estoqueAula <= 0) return alert("Produto fora de estoque!");
+            estoqueAula--;
+            document.getElementById('estoque-aula').innerText = "Estoque: " + estoqueAula;
+            break;
+        case 'dias':
+            if (estoqueDias <= 0) return alert("Produto fora de estoque!");
+            estoqueDias--;
+            document.getElementById('estoque-dias').innerText = "Estoque: " + estoqueDias;
+            break;
+        case 'bala':
+            if (estoqueBala <= 0) return alert("Produto fora de estoque!");
+            estoqueBala--;
+            document.getElementById('estoque-bala').innerText = "Estoque: " + estoqueBala;
+            break;
+    }
+
+    moedas -= preco;
+    atualizarTotal();
+    salvarEstado(); 
+    alert("Compra realizada com sucesso!");
+}
+
+function logout() {
+    localStorage.removeItem("usuario_logado");
+    window.location.href = "index.html";
+}
+
+window.onload = () => {
+    const user = localStorage.getItem("usuario_logado");
+    if (!user) {
+        alert("Você precisa estar logado!");
+        window.location.href = "index.html";
+    } else {
+        document.getElementById("nome-usuario").innerText = user;
+        carregarEstado();
+    }
+};
