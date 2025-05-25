@@ -110,6 +110,48 @@
     </div>
   </div>
 
-  <script src="loja.js"></script>
+  <script>
+    // Função para buscar o nome do usuário logado
+    const nomeUsuario = localStorage.getItem('usuario_logado');
+    if (!nomeUsuario) {
+      window.location.href = "index.html"; // Redireciona para o login se não houver usuário logado
+    } else {
+      document.getElementById('nome-usuario').innerText = nomeUsuario;
+    }
+
+    // Função para ganhar 1 Mrcoin
+    function ganharMoeda() {
+      let total = parseInt(localStorage.getItem(nomeUsuario + '_mrcoin') || '0');
+      total += 1;
+      localStorage.setItem(nomeUsuario + '_mrcoin', total);
+      document.getElementById('total-moedas').innerText = total;
+    }
+
+    // Função para comprar um produto
+    function comprarProduto(preco, produto) {
+      let total = parseInt(localStorage.getItem(nomeUsuario + '_mrcoin') || '0');
+      if (total >= preco) {
+        total -= preco;
+        localStorage.setItem(nomeUsuario + '_mrcoin', total);
+        document.getElementById('total-moedas').innerText = total;
+        alert("Você comprou o " + produto + " com sucesso!");
+      } else {
+        alert("Você não tem moedas suficientes para comprar o " + produto);
+      }
+    }
+
+    // Função de logout
+    function logout() {
+      localStorage.removeItem('usuario_logado');
+      localStorage.removeItem(nomeUsuario + '_mrcoin');
+      window.location.href = "index.html"; // Redireciona para a página de login
+    }
+
+    // Carregar o saldo de Mrcoin ao carregar a página
+    window.onload = () => {
+      let totalMoedas = parseInt(localStorage.getItem(nomeUsuario + '_mrcoin') || '0');
+      document.getElementById('total-moedas').innerText = totalMoedas;
+    };
+  </script>
 </body>
 </html>
