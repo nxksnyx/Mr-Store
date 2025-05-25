@@ -80,9 +80,16 @@ function comprarProduto(preco, tipo) {
 }
 
 function logout() {
-    document.cookie = "usuario_logado=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/"; // Remover o cookie
+    // Remove o cookie de login
+    document.cookie = "usuario_logado=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+
+    // Remove o item do localStorage (se necessário)
+    localStorage.removeItem("usuario_logado");
+
+    // Redireciona para a página de login
     window.location.href = "index.html";
 }
+
 
 window.onload = () => {
     const user = getCookie("usuario_logado");
