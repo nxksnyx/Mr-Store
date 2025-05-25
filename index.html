@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MrStore - Login</title>
   <style>
-    /* Estilos do seu HTML aqui */
     body {
       font-family: Arial, sans-serif;
       background-image: url('https://i.imgur.com/sI8LmKe.png');
@@ -21,18 +20,59 @@
       color: white;
     }
 
-    /* Outros estilos para header, form, etc... */
+    .header {
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    .form-container {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 300px;
+    }
+
+    input {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    button {
+      background-color: #FFD700;
+      color: black;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    a {
+      color: #FFD700;
+      cursor: pointer;
+    }
+
+    .header img {
+      width: 150px; /* Tamanho da imagem ajustado */
+      margin-top: 10px;
+    }
   </style>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-
 </head>
 <body>
+
   <div class="header">
     <h1>Bem-vindo à MrStore!</h1>
+    <!-- Imagem de logo ajustada -->
     <img src="https://i.imgur.com/9Thbwqj.png" alt="Logo">
   </div>
 
@@ -54,24 +94,8 @@
     <p>Já tem uma conta? <a onclick="mostrarLogin()">Fazer login</a></p>
   </div>
 
-  <!-- Aqui vai a parte do código JavaScript do Firebase -->
   <script>
-    // Configuração do Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyCh9xX0Py_J6xiCOxEGnZS0Pwnha8OZwmw",
-      authDomain: "mrstore-6b888.firebaseapp.com",
-      projectId: "mrstore-6b888",
-      storageBucket: "mrstore-6b888.firebasestorage.app",
-      messagingSenderId: "387627289090",
-      appId: "1:387627289090:web:da4ca1f58ad9ce0354b51b"
-    };
-
-    // Inicializar o Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const database = firebase.database();
-
-    // Funções de login e cadastro (não altere essas funções)
+    // Funções de login e cadastro (sem Firebase)
     function mostrarCadastro() {
       document.getElementById('cadastro-container').style.display = 'block';
       document.getElementById('login-container').style.display = 'none';
@@ -86,40 +110,35 @@
       const username = document.getElementById('login-username').value;
       const password = document.getElementById('login-password').value;
 
-      const userRef = database.ref('usuarios/' + username);
-      userRef.once('value').then(snapshot => {
-        const usuario = snapshot.val();
-        if (usuario && usuario.senha === password) {
-          alert("Login bem-sucedido!");
-          localStorage.setItem("usuario_logado", username);
-          window.location.href = "loja.html";
-        } else {
-          alert("Usuário ou senha incorretos!");
-        }
-      });
+      const usuario = JSON.parse(localStorage.getItem(username));
+
+      if (usuario && usuario.senha === password) {
+        alert("Login bem-sucedido!");
+        localStorage.setItem("usuario_logado", username);
+        window.location.href = "loja.html";
+      } else {
+        alert("Usuário ou senha incorretos!");
+      }
     }
 
     function fazerCadastro() {
       const username = document.getElementById('cadastro-username').value;
       const password = document.getElementById('cadastro-password').value;
 
-      const userRef = database.ref('usuarios/' + username);
-      userRef.once('value').then(snapshot => {
-        if (snapshot.exists()) {
-          alert("Usuário já existe. Tente outro nome.");
-          return;
-        }
+      if (localStorage.getItem(username)) {
+        alert("Usuário já existe. Tente outro nome.");
+        return;
+      }
 
-        const novoUsuario = {
-          username: username,
-          senha: password
-        };
+      const novoUsuario = {
+        username: username,
+        senha: password
+      };
 
-        userRef.set(novoUsuario);
-        alert("Cadastro realizado com sucesso!");
-        localStorage.setItem("usuario_logado", username);
-        window.location.href = "loja.html";
-      });
+      localStorage.setItem(username, JSON.stringify(novoUsuario));
+      alert("Cadastro realizado com sucesso!");
+      localStorage.setItem("usuario_logado", username);
+      window.location.href = "loja.html";
     }
   </script>
 
