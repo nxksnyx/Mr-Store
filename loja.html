@@ -52,6 +52,7 @@
       max-width: 100%;
       height: auto;
       margin-bottom: 10px;
+      max-height: 200px; /* Ajuste no tamanho das imagens */
     }
 
     button {
@@ -75,35 +76,80 @@
   <div class="container">
     <div class="product-list">
       <h3>Produtos disponíveis</h3>
+      
+      <!-- Bola da Nike -->
       <div class="product">
-        <img src="https://th.bing.com/th/id/OIP.yg3WT93KwB0uYix_nkE2SwHaHa?w=202&h=202" alt="Bola">
-        <h4>Bola</h4>
-        <p>Preço: 100.000.000 Mrcoin</p>
-        <p id="estoque-bola">Estoque: 1</p>
-        <button onclick="comprarProduto(100000000, 'bola')">Comprar</button>
+        <img src="https://static.netshoes.com.br/produtos/bola-de-futebol-campo-nike-merlin-cbf/14/HZM-2881-114/HZM-2881-114_zoom2.jpg" alt="Bola da Nike">
+        <h4>Bola da Nike</h4>
+        <p>Preço: 5000 Mrcoin</p>
+        <p id="estoque-bola-nike">Estoque: 1</p>
+        <button onclick="comprarProduto(5000, 'bola-nike')">Comprar</button>
       </div>
+
+      <!-- Aula com jogos e brincadeiras -->
       <div class="product">
-        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhGAdr6Fa6Nc3v-SzL-wGqSeQLRBG112C5pJ-TrMQEMH2c9FeSTrn-MyHW9Rz9P-ZVGthF4ZJ5KXVMY52bTLeO9XAf1tG1wwFUkXPeS8zdZ1V2tgo_i5mwcbCeyEBydJ3HdkNGRjGtlmgvn/s1600/bagunca.jpg" alt="Aula Livre">
-        <h4>Aula Livre</h4>
-        <p>Preço: 15 Mrcoin</p>
-        <p id="estoque-aula">Estoque: 100</p>
-        <button onclick="comprarProduto(15, 'aula')">Comprar</button>
+        <img src="https://2.bp.blogspot.com/-c68QkhR3hRc/UFcYdZ8ezrI/AAAAAAAACAQ/8nrWUMt3_iI/s1600/P%C3%A1tio+-+flores+(5).JPG" alt="Aula com jogos e brincadeiras">
+        <h4>Aula com jogos e brincadeiras na área externa</h4>
+        <p>Preço: 1000 Mrcoin</p>
+        <p id="estoque-jogos">Estoque: 1</p>
+        <button onclick="comprarProduto(1000, 'jogos')">Comprar</button>
       </div>
+
+      <!-- Aula extra de Educação física -->
       <div class="product">
-        <img src="https://thumbs.dreamstime.com/b/menino-novo-que-joga-os-jogos-video-51314979.jpg" alt="100 Dias Sem Aula">
-        <h4>100 Dias Sem Aula</h4>
+        <img src="https://jundiai.sp.gov.br/noticias/wp-content/uploads/sites/32/2018/11/emeb_marcos_gasparian-166.jpg" alt="Aula extra de Educação física">
+        <h4>Aula extra de Educação física</h4>
+        <p>Preço: 1000 Mrcoin</p>
+        <p id="estoque-educacao">Estoque: 1</p>
+        <button onclick="comprarProduto(1000, 'educacao')">Comprar</button>
+      </div>
+
+      <!-- Aula interativa na horta -->
+      <div class="product">
+        <img src="https://2.bp.blogspot.com/-Lj4wkphotVI/U9Gf68lVWRI/AAAAAAAAAog/6DV5vfqTe4U/s1600/DSC08998.JPG" alt="Aula interativa na horta">
+        <h4>Aula interativa na horta</h4>
+        <p>Preço: 1000 Mrcoin</p>
+        <p id="estoque-horta">Estoque: 1</p>
+        <button onclick="comprarProduto(1000, 'horta')">Comprar</button>
+      </div>
+
+      <!-- Aula com jogos virtuais -->
+      <div class="product">
+        <img src="https://img.freepik.com/fotos-gratis/criancas-da-escola-usando-tablet-digital-em-sala-de-aula_107420-57955.jpg?size=626&ext=jpg" alt="Aula com jogos virtuais">
+        <h4>Aula com jogos virtuais</h4>
+        <p>Preço: 1000 Mrcoin</p>
+        <p id="estoque-jogos-virtuais">Estoque: 1</p>
+        <button onclick="comprarProduto(1000, 'jogos-virtuais')">Comprar</button>
+      </div>
+
+      <!-- Balas -->
+      <div class="product">
+        <img src="https://a-static.mlcdn.com.br/800x560/pacote-bala-7-belo-framboesa-600g-arcor/produtosdemaquiagem/10761p/370cbc11ef578c1c36f9c6bc2996a45b.jpg" alt="Balas">
+        <h4>Balas</h4>
+        <p>Preço: 10 Mrcoin</p>
+        <p id="estoque-balas">Estoque: 300</p>
+        <button onclick="comprarProduto(10, 'balas')">Comprar</button>
+      </div>
+
+      <!-- Pirulito -->
+      <div class="product">
+        <img src="https://cdn.awsli.com.br/2500x2500/1957/1957771/produto/1047748409ee2f58d9d.jpg" alt="Pirulito">
+        <h4>Pirulito</h4>
         <p>Preço: 20 Mrcoin</p>
-        <p id="estoque-dias">Estoque: 50</p>
-        <button onclick="comprarProduto(20, 'dias')">Comprar</button>
+        <p id="estoque-pirulito">Estoque: 100</p>
+        <button onclick="comprarProduto(20, 'pirulito')">Comprar</button>
       </div>
+
+      <!-- Aula de cinema com pipoca -->
       <div class="product">
-        <img src="https://via.placeholder.com/150" alt="Doce Bala">
-        <h4>Doce Bala</h4>
-        <p>Preço: 5 Mrcoin</p>
-        <p id="estoque-bala">Estoque: 200</p>
-        <button onclick="comprarProduto(5, 'bala')">Comprar</button>
+        <img src="https://2.bp.blogspot.com/-goes4lu3wsQ/VTl7mzY2lpI/AAAAAAAAGR0/By2X6yTVvZk/s1600/crian%C3%A7as-filmes.jpg" alt="Aula de cinema com pipoca">
+        <h4>Aula de cinema com pipoca na sala</h4>
+        <p>Preço: 1000 Mrcoin</p>
+        <p id="estoque-cinema">Estoque: 1</p>
+        <button onclick="comprarProduto(1000, 'cinema')">Comprar</button>
       </div>
     </div>
+
     <div class="total">
       <h3>Total de Mrcoin: <span id="total-moedas">0</span></h3>
       <button onclick="ganharMoeda()">Ganhar 1 Mrcoin</button>
@@ -111,15 +157,13 @@
   </div>
 
   <script>
-    // Função para buscar o nome do usuário logado
     const nomeUsuario = localStorage.getItem('usuario_logado');
     if (!nomeUsuario) {
-      window.location.href = "index.html"; // Redireciona para o login se não houver usuário logado
+      window.location.href = "index.html"; 
     } else {
       document.getElementById('nome-usuario').innerText = nomeUsuario;
     }
 
-    // Função para ganhar 1 Mrcoin
     function ganharMoeda() {
       let total = parseInt(localStorage.getItem(nomeUsuario + '_mrcoin') || '0');
       total += 1;
@@ -127,7 +171,6 @@
       document.getElementById('total-moedas').innerText = total;
     }
 
-    // Função para comprar um produto
     function comprarProduto(preco, produto) {
       let total = parseInt(localStorage.getItem(nomeUsuario + '_mrcoin') || '0');
       if (total >= preco) {
@@ -140,14 +183,11 @@
       }
     }
 
-    // Função de logout
     function logout() {
       localStorage.removeItem('usuario_logado');
-      localStorage.removeItem(nomeUsuario + '_mrcoin');
-      window.location.href = "index.html"; // Redireciona para a página de login
+      window.location.href = "index.html";
     }
 
-    // Carregar o saldo de Mrcoin ao carregar a página
     window.onload = () => {
       let totalMoedas = parseInt(localStorage.getItem(nomeUsuario + '_mrcoin') || '0');
       document.getElementById('total-moedas').innerText = totalMoedas;

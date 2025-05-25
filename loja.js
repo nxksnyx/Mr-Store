@@ -1,49 +1,46 @@
 let moedas = 0;
-let estoqueBola = 1;
-let estoqueAula = 100;
-let estoqueDias = 50;
-let estoqueBala = 200;
+let estoque = {
+  bolaNike: 1,
+  jogos: 1,
+  educacao: 1,
+  horta: 1,
+  jogosVirtuais: 1,
+  balas: 300,
+  pirulito: 100,
+  cinema: 1
+};
 
-// Função para verificar se o usuário está logado
-function verificarLogin() {
-    const usuarioLogado = localStorage.getItem("usuario_logado");
-
-    if (!usuarioLogado) {
-        alert("Você precisa estar logado!");
-        window.location.href = "login.html";  // Se não estiver logado, redireciona para o login
-    } else {
-        document.getElementById("nome-usuario").innerText = usuarioLogado;
-        carregarEstado();
-    }
+// Função para ganhar moedas
+function ganharMoeda() {
+  moedas++;
+  atualizarTela();
 }
 
-// Função de logout
-function logout() {
-    localStorage.removeItem("usuario_logado");
-    alert("Logout bem-sucedido!");
-    window.location.href = "login.html";  // Redireciona para o login
+// Função para atualizar a tela de saldo
+function atualizarTela() {
+  document.getElementById('moedas').innerText = moedas;
 }
 
-window.onload = verificarLogin;
-
-// Funções de compra e gerenciamento de estoque
-function carregarEstado() {
-    estoqueBola = parseInt(localStorage.getItem("estoqueBola")) || 1;
-    estoqueAula = parseInt(localStorage.getItem("estoqueAula")) || 100;
-    estoqueDias = parseInt(localStorage.getItem("estoqueDias")) || 50;
-    estoqueBala = parseInt(localStorage.getItem("estoqueBala")) || 200;
-    moedas = parseInt(localStorage.getItem("moedas")) || 0;
-    atualizarTotal();
+// Função para comprar um produto
+function comprarProduto(preco, produto) {
+  if (moedas >= preco && estoque[produto] > 0) {
+    moedas -= preco;
+    estoque[produto]--;
+    atualizarTela();
+    alert('Você comprou ' + produto);
+  } else {
+    alert('Não há moedas suficientes ou estoque insuficiente');
+  }
 }
 
-function salvarEstado() {
-    localStorage.setItem("moedas", moedas);
-    localStorage.setItem("estoqueBola", estoqueBola);
-    localStorage.setItem("estoqueAula", estoqueAula);
-    localStorage.setItem("estoqueDias", estoqueDias);
-    localStorage.setItem("estoqueBala", estoqueBala);
-}
-
-function atualizarTotal() {
-    document.getElementById('total-moedas').innerText = moedas;
-}
+// Produtos disponíveis
+let produtos = [
+  { nome: 'bolaNike', preco: 5000 },
+  { nome: 'jogos', preco: 1000 },
+  { nome: 'educacao', preco: 1000 },
+  { nome: 'horta', preco: 1000 },
+  { nome: 'jogosVirtuais', preco: 1000 },
+  { nome: 'balas', preco: 10 },
+  { nome: 'pirulito', preco: 20 },
+  { nome: 'cinema', preco: 1000 }
+];

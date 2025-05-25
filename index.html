@@ -131,50 +131,34 @@
 
     // Função de cadastro
     function cadastrarUsuario(username, password) {
-      fetch('http://localhost:5000/cadastro', {  // Ajuste a URL conforme seu servidor
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: username, senha: password })  // Envia email e senha para o backend
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.message === "Cadastro bem-sucedido!") {
-          alert("Cadastro realizado com sucesso!");
-          window.location.href = "loja.html";  // Redireciona para a página da loja
-        } else {
-          alert(data.message);  // Exibe a mensagem de erro
-        }
-      })
-      .catch(error => {
-        console.error("Erro ao cadastrar:", error);
-        alert("Ocorreu um erro. Tente novamente.");
-      });
+      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+
+      // Verificando se o e-mail já está cadastrado
+      const usuarioExistente = usuarios.find(user => user.email === username);
+      if (usuarioExistente) {
+        alert("Este e-mail já está cadastrado.");
+        return;
+      }
+
+      // Adicionando o novo usuário
+      usuarios.push({ email: username, password: password });
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
+      alert("Cadastro realizado com sucesso!");
+      window.location.href = "loja.html";  // Redireciona para a página da loja
     }
 
     // Função de login
     function fazerLogin(username, password) {
-      fetch('http://localhost:5000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: username, senha: password })  // Envia email e senha para o backend
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.message === "Login bem-sucedido!") {
-          alert("Login bem-sucedido!");
-          window.location.href = "loja.html";  // Redireciona para a página da loja
-        } else {
-          alert(data.message);  // Exibe a mensagem de erro
-        }
-      })
-      .catch(error => {
-        console.error("Erro ao logar:", error);
-        alert("Ocorreu um erro. Tente novamente.");
-      });
+      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+      
+      const usuario = usuarios.find(user => user.email === username && user.password === password);
+      
+      if (usuario) {
+        alert("Login bem-sucedido!");
+        window.location.href = "loja.html";  // Redireciona para a página da loja
+      } else {
+        alert("Email ou senha incorretos.");
+      }
     }
   </script>
 </body>
