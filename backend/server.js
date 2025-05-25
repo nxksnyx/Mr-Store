@@ -1,11 +1,17 @@
-// Importando as dependências
+const dotenv = require('dotenv');
+dotenv.config();  // Carrega as variáveis do arquivo .env
+
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
-const dotenv = require('dotenv');
+const cors = require('cors');  // Certifique-se de importar o cors
 
-// Carregando as variáveis de ambiente do arquivo .env
-dotenv.config();
+// Verifique se a variável de ambiente está sendo carregada corretamente
+console.log("MONGODB_URI:", process.env.MONGODB_URI);  // Exibe a variável MONGODB_URI no console
+
+// Conectando ao MongoDB
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Conectado ao MongoDB'))
+  .catch(err => console.log('Erro ao conectar ao MongoDB:', err));
 
 // Criando a aplicação Express
 const app = express();
@@ -19,11 +25,6 @@ app.use(cors({
 
 // Usando o middleware para interpretar requisições JSON
 app.use(express.json());
-
-// Conectando ao banco de dados MongoDB
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Conectado ao MongoDB'))
-  .catch(err => console.log('Erro ao conectar ao MongoDB:', err));
 
 // Definindo o modelo de usuário
 const Usuario = mongoose.model('Usuario', new mongoose.Schema({
