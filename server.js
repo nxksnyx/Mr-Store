@@ -10,7 +10,7 @@ const app = express();
 
 // Configuração do CORS para aceitar requisições do seu frontend
 const corsOptions = {
-  origin: 'https://nxksnyx-github-io.vercel.app',  // URL do seu site hospedado
+  origin: 'http://localhost:5000/login',  // URL do seu site hospedado
   methods: 'GET,POST',
   allowedHeaders: 'Content-Type',
 };

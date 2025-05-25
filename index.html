@@ -131,7 +131,8 @@
 
     // Função de cadastro
     function cadastrarUsuario(username, password) {
-      fetch('https://nxksnyx-github-io.vercel.app/', {  // URL do backend
+      fetch('http://localhost:5000/login', {
+  // URL do backend
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -155,7 +156,8 @@
 
 // Função de login
 function fazerLogin(username, password) {
-  fetch('https://nxksnyx-github-io.vercel.app/, {  // Substitua aqui pela URL do seu backend real
+  fetch('http://localhost:5000/login', {
+  // Substitua aqui pela URL do seu backend real
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
