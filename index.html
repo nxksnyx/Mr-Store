@@ -63,7 +63,7 @@
     }
 
     .header img {
-      width: 150px; /* Tamanho da imagem ajustado */
+      width: 150px;
       margin-top: 10px;
     }
   </style>
@@ -94,31 +94,55 @@
   </div>
 
   <script>
-    // Funções de login e cadastro (sem Firebase)
+    // Função para criar o cookie
+    function setCookie(name, value, days) {
+      const d = new Date();
+      d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000)); // Expiração em dias
+      let expires = "expires=" + d.toUTCString();
+      document.cookie = name + "=" + value + ";" + expires + ";path=/";
+    }
+
+    // Função para obter o valor de um cookie
+    function getCookie(name) {
+      let nameEQ = name + "=";
+      let ca = document.cookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+      }
+      return null;
+    }
+
+    // Exibir a tela de cadastro
     function mostrarCadastro() {
       document.getElementById('cadastro-container').style.display = 'block';
       document.getElementById('login-container').style.display = 'none';
     }
 
+    // Exibir a tela de login
     function mostrarLogin() {
       document.getElementById('cadastro-container').style.display = 'none';
       document.getElementById('login-container').style.display = 'block';
     }
 
+    // Fazer login do usuário
     function fazerLogin() {
       const username = document.getElementById('login-username').value;
       const password = document.getElementById('login-password').value;
+
       const usuario = JSON.parse(localStorage.getItem(username));
 
       if (usuario && usuario.senha === password) {
         alert("Login bem-sucedido!");
-        localStorage.setItem("usuario_logado", username);
+        setCookie("usuario_logado", username, 30); // Salvar cookie por 30 dias
         window.location.href = "loja.html"; // Redirecionar para a página de loja
       } else {
         alert("Usuário ou senha incorretos!");
       }
     }
 
+    // Fazer cadastro de um novo usuário
     function fazerCadastro() {
       const username = document.getElementById('cadastro-username').value;
       const password = document.getElementById('cadastro-password').value;
@@ -135,9 +159,20 @@
 
       localStorage.setItem(username, JSON.stringify(novoUsuario));
       alert("Cadastro realizado com sucesso!");
-      localStorage.setItem("usuario_logado", username);
+      setCookie("usuario_logado", username, 30); // Salvar cookie por 30 dias
       window.location.href = "loja.html"; // Redirecionar para a página de loja
     }
+
+    // Verificar se já existe um usuário logado
+    window.onload = () => {
+      const user = getCookie("usuario_logado");
+      if (!user) {
+        alert("Você precisa estar logado!");
+        window.location.href = "index.html";
+      } else {
+        document.getElementById("nome-usuario").innerText = user;
+      }
+    };
   </script>
 
 </body>

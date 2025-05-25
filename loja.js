@@ -4,46 +4,34 @@ let estoqueAula = 100;
 let estoqueDias = 50;
 let estoqueBala = 200;
 
-// Funções para manipulação de cookies
-function setCookie(nome, valor, dias) {
-    const dataExpiracao = new Date();
-    dataExpiracao.setTime(dataExpiracao.getTime() + (dias * 24 * 60 * 60 * 1000)); // Definir o tempo de expiração
-    const expires = "expires=" + dataExpiracao.toUTCString();
-    document.cookie = nome + "=" + valor + ";" + expires + ";path=/";
-}
-
-function getCookie(nome) {
-    const nomeEQ = nome + "=";
-    const ca = document.cookie.split(';');
+// Função para obter o cookie
+function getCookie(name) {
+    let nameEQ = name + "=";
+    let ca = document.cookie.split(';');
     for (let i = 0; i < ca.length; i++) {
         let c = ca[i];
-        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-        if (c.indexOf(nomeEQ) === 0) return c.substring(nomeEQ.length, c.length);
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
     }
     return null;
 }
 
-function deleteCookie(nome) {
-    document.cookie = nome + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-}
-
-// Carregar estado a partir dos cookies
+// Carregar estado (moedas e estoque)
 function carregarEstado() {
-    estoqueBola = parseInt(getCookie("estoqueBola")) || 1;
-    estoqueAula = parseInt(getCookie("estoqueAula")) || 100;
-    estoqueDias = parseInt(getCookie("estoqueDias")) || 50;
-    estoqueBala = parseInt(getCookie("estoqueBala")) || 200;
-    moedas = parseInt(getCookie("moedas")) || 0;
+    estoqueBola = parseInt(localStorage.getItem("estoqueBola")) || 1;
+    estoqueAula = parseInt(localStorage.getItem("estoqueAula")) || 100;
+    estoqueDias = parseInt(localStorage.getItem("estoqueDias")) || 50;
+    estoqueBala = parseInt(localStorage.getItem("estoqueBala")) || 200;
+    moedas = parseInt(localStorage.getItem("moedas")) || 0;
     atualizarTotal();
 }
 
-// Salvar estado nos cookies
 function salvarEstado() {
-    setCookie("moedas", moedas, 7); // Expira em 7 dias
-    setCookie("estoqueBola", estoqueBola, 7);
-    setCookie("estoqueAula", estoqueAula, 7);
-    setCookie("estoqueDias", estoqueDias, 7);
-    setCookie("estoqueBala", estoqueBala, 7);
+    localStorage.setItem("moedas", moedas);
+    localStorage.setItem("estoqueBola", estoqueBola);
+    localStorage.setItem("estoqueAula", estoqueAula);
+    localStorage.setItem("estoqueDias", estoqueDias);
+    localStorage.setItem("estoqueBala", estoqueBala);
 }
 
 function atualizarTotal() {
@@ -87,12 +75,12 @@ function comprarProduto(preco, tipo) {
 
     moedas -= preco;
     atualizarTotal();
-    salvarEstado(); 
+    salvarEstado();
     alert("Compra realizada com sucesso!");
 }
 
 function logout() {
-    deleteCookie("usuario_logado");
+    document.cookie = "usuario_logado=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/"; // Remover o cookie
     window.location.href = "index.html";
 }
 
