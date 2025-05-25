@@ -65,6 +65,11 @@
       font-weight: bold;
       margin-top: 10px;
     }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
@@ -78,75 +83,75 @@
       <h3>Produtos disponíveis</h3>
       
       <!-- Bola da Nike -->
-      <div class="product">
+      <div class="product" id="produto-bola-nike">
         <img src="https://static.netshoes.com.br/produtos/bola-de-futebol-campo-nike-merlin-cbf/14/HZM-2881-114/HZM-2881-114_zoom2.jpg" alt="Bola da Nike">
         <h4>Bola da Nike</h4>
         <p>Preço: 5000 Mrcoin</p>
         <p id="estoque-bola-nike">Estoque: 1</p>
-        <button onclick="comprarProduto(5000, 'bola-nike')">Comprar</button>
+        <button id="btn-bola-nike" onclick="comprarProduto(5000, 'bola-nike')">Comprar</button>
       </div>
 
       <!-- Aula com jogos e brincadeiras -->
-      <div class="product">
+      <div class="product" id="produto-jogos">
         <img src="https://2.bp.blogspot.com/-c68QkhR3hRc/UFcYdZ8ezrI/AAAAAAAACAQ/8nrWUMt3_iI/s1600/P%C3%A1tio+-+flores+(5).JPG" alt="Aula com jogos e brincadeiras">
         <h4>Aula com jogos e brincadeiras na área externa</h4>
         <p>Preço: 1000 Mrcoin</p>
         <p id="estoque-jogos">Estoque: 1</p>
-        <button onclick="comprarProduto(1000, 'jogos')">Comprar</button>
+        <button id="btn-jogos" onclick="comprarProduto(1000, 'jogos')">Comprar</button>
       </div>
 
       <!-- Aula extra de Educação física -->
-      <div class="product">
+      <div class="product" id="produto-educacao">
         <img src="https://jundiai.sp.gov.br/noticias/wp-content/uploads/sites/32/2018/11/emeb_marcos_gasparian-166.jpg" alt="Aula extra de Educação física">
         <h4>Aula extra de Educação física</h4>
         <p>Preço: 1000 Mrcoin</p>
         <p id="estoque-educacao">Estoque: 1</p>
-        <button onclick="comprarProduto(1000, 'educacao')">Comprar</button>
+        <button id="btn-educacao" onclick="comprarProduto(1000, 'educacao')">Comprar</button>
       </div>
 
       <!-- Aula interativa na horta -->
-      <div class="product">
+      <div class="product" id="produto-horta">
         <img src="https://2.bp.blogspot.com/-Lj4wkphotVI/U9Gf68lVWRI/AAAAAAAAAog/6DV5vfqTe4U/s1600/DSC08998.JPG" alt="Aula interativa na horta">
         <h4>Aula interativa na horta</h4>
         <p>Preço: 1000 Mrcoin</p>
         <p id="estoque-horta">Estoque: 1</p>
-        <button onclick="comprarProduto(1000, 'horta')">Comprar</button>
+        <button id="btn-horta" onclick="comprarProduto(1000, 'horta')">Comprar</button>
       </div>
 
       <!-- Aula com jogos virtuais -->
-      <div class="product">
+      <div class="product" id="produto-jogos-virtuais">
         <img src="https://img.freepik.com/fotos-gratis/criancas-da-escola-usando-tablet-digital-em-sala-de-aula_107420-57955.jpg?size=626&ext=jpg" alt="Aula com jogos virtuais">
         <h4>Aula com jogos virtuais</h4>
         <p>Preço: 1000 Mrcoin</p>
         <p id="estoque-jogos-virtuais">Estoque: 1</p>
-        <button onclick="comprarProduto(1000, 'jogos-virtuais')">Comprar</button>
+        <button id="btn-jogos-virtuais" onclick="comprarProduto(1000, 'jogos-virtuais')">Comprar</button>
       </div>
 
       <!-- Balas -->
-      <div class="product">
+      <div class="product" id="produto-balas">
         <img src="https://a-static.mlcdn.com.br/800x560/pacote-bala-7-belo-framboesa-600g-arcor/produtosdemaquiagem/10761p/370cbc11ef578c1c36f9c6bc2996a45b.jpg" alt="Balas">
         <h4>Balas</h4>
         <p>Preço: 10 Mrcoin</p>
         <p id="estoque-balas">Estoque: 300</p>
-        <button onclick="comprarProduto(10, 'balas')">Comprar</button>
+        <button id="btn-balas" onclick="comprarProduto(10, 'balas')">Comprar</button>
       </div>
 
       <!-- Pirulito -->
-      <div class="product">
+      <div class="product" id="produto-pirulito">
         <img src="https://cdn.awsli.com.br/2500x2500/1957/1957771/produto/1047748409ee2f58d9d.jpg" alt="Pirulito">
         <h4>Pirulito</h4>
         <p>Preço: 20 Mrcoin</p>
         <p id="estoque-pirulito">Estoque: 100</p>
-        <button onclick="comprarProduto(20, 'pirulito')">Comprar</button>
+        <button id="btn-pirulito" onclick="comprarProduto(20, 'pirulito')">Comprar</button>
       </div>
 
       <!-- Aula de cinema com pipoca -->
-      <div class="product">
+      <div class="product" id="produto-cinema">
         <img src="https://2.bp.blogspot.com/-goes4lu3wsQ/VTl7mzY2lpI/AAAAAAAAGR0/By2X6yTVvZk/s1600/crian%C3%A7as-filmes.jpg" alt="Aula de cinema com pipoca">
         <h4>Aula de cinema com pipoca na sala</h4>
         <p>Preço: 1000 Mrcoin</p>
         <p id="estoque-cinema">Estoque: 1</p>
-        <button onclick="comprarProduto(1000, 'cinema')">Comprar</button>
+        <button id="btn-cinema" onclick="comprarProduto(1000, 'cinema')">Comprar</button>
       </div>
     </div>
 
@@ -164,22 +169,44 @@
       document.getElementById('nome-usuario').innerText = nomeUsuario;
     }
 
+    let moedas = parseInt(localStorage.getItem(nomeUsuario + '_mrcoin') || '0');
+    let estoque = {
+      'bola-nike': 1,
+      'jogos': 1,
+      'educacao': 1,
+      'horta': 1,
+      'jogos-virtuais': 1,
+      'balas': 300,
+      'pirulito': 100,
+      'cinema': 1
+    };
+
+    // Função para ganhar moedas
     function ganharMoeda() {
-      let total = parseInt(localStorage.getItem(nomeUsuario + '_mrcoin') || '0');
-      total += 1;
-      localStorage.setItem(nomeUsuario + '_mrcoin', total);
-      document.getElementById('total-moedas').innerText = total;
+      moedas++;
+      localStorage.setItem(nomeUsuario + '_mrcoin', moedas);
+      document.getElementById('total-moedas').innerText = moedas;
     }
 
+    // Função para atualizar o estoque e verificar o botão de compra
+    function atualizarEstoque(produto) {
+      document.getElementById(`estoque-${produto}`).innerText = `Estoque: ${estoque[produto]}`;
+      if (estoque[produto] <= 0) {
+        document.getElementById(`btn-${produto}`).disabled = true;
+      }
+    }
+
+    // Função para comprar produto
     function comprarProduto(preco, produto) {
-      let total = parseInt(localStorage.getItem(nomeUsuario + '_mrcoin') || '0');
-      if (total >= preco) {
-        total -= preco;
-        localStorage.setItem(nomeUsuario + '_mrcoin', total);
-        document.getElementById('total-moedas').innerText = total;
+      if (moedas >= preco && estoque[produto] > 0) {
+        moedas -= preco;
+        estoque[produto]--;
+        localStorage.setItem(nomeUsuario + '_mrcoin', moedas);
+        document.getElementById('total-moedas').innerText = moedas;
+        atualizarEstoque(produto);
         alert("Você comprou o " + produto + " com sucesso!");
       } else {
-        alert("Você não tem moedas suficientes para comprar o " + produto);
+        alert("Você não tem moedas suficientes ou o estoque acabou.");
       }
     }
 
@@ -189,8 +216,10 @@
     }
 
     window.onload = () => {
-      let totalMoedas = parseInt(localStorage.getItem(nomeUsuario + '_mrcoin') || '0');
-      document.getElementById('total-moedas').innerText = totalMoedas;
+      document.getElementById('total-moedas').innerText = moedas;
+      for (let produto in estoque) {
+        atualizarEstoque(produto);
+      }
     };
   </script>
 </body>
