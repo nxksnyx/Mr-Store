@@ -161,66 +161,66 @@
     </div>
   </div>
 
-  <script>
-    const nomeUsuario = localStorage.getItem('usuario_logado');
-    if (!nomeUsuario) {
-      window.location.href = "index.html"; 
-    } else {
-      document.getElementById('nome-usuario').innerText = nomeUsuario;
+<script>
+  const nomeUsuario = localStorage.getItem('usuario_logado');
+  if (!nomeUsuario) {
+    window.location.href = "index.html";  // Redireciona para a página de login
+  } else {
+    document.getElementById('nome-usuario').innerText = nomeUsuario;
+  }
+
+  let moedas = parseInt(localStorage.getItem(nomeUsuario + '_mrcoin') || '0');
+  let estoque = {
+    'bola-nike': 1,
+    'jogos': 1,
+    'educacao': 1,
+    'horta': 1,
+    'jogos-virtuais': 1,
+    'balas': 300,
+    'pirulito': 100,
+    'cinema': 1
+  };
+
+  // Função para ganhar moedas
+  function ganharMoeda() {
+    moedas++;
+    localStorage.setItem(nomeUsuario + '_mrcoin', moedas);
+    document.getElementById('total-moedas').innerText = moedas;
+  }
+
+  // Função para atualizar o estoque e verificar o botão de compra
+  function atualizarEstoque(produto) {
+    document.getElementById(`estoque-${produto}`).innerText = `Estoque: ${estoque[produto]}`;
+    if (estoque[produto] <= 0) {
+      document.getElementById(`btn-${produto}`).disabled = true;
     }
+  }
 
-    let moedas = parseInt(localStorage.getItem(nomeUsuario + '_mrcoin') || '0');
-    let estoque = {
-      'bola-nike': 1,
-      'jogos': 1,
-      'educacao': 1,
-      'horta': 1,
-      'jogos-virtuais': 1,
-      'balas': 300,
-      'pirulito': 100,
-      'cinema': 1
-    };
-
-    // Função para ganhar moedas
-    function ganharMoeda() {
-      moedas++;
+  // Função para comprar produto
+  function comprarProduto(preco, produto) {
+    if (moedas >= preco && estoque[produto] > 0) {
+      moedas -= preco;
+      estoque[produto]--;
       localStorage.setItem(nomeUsuario + '_mrcoin', moedas);
       document.getElementById('total-moedas').innerText = moedas;
+      atualizarEstoque(produto);
+      alert("Você comprou o " + produto + " com sucesso!");
+    } else {
+      alert("Você não tem moedas suficientes ou o estoque acabou.");
     }
+  }
 
-    // Função para atualizar o estoque e verificar o botão de compra
-    function atualizarEstoque(produto) {
-      document.getElementById(`estoque-${produto}`).innerText = `Estoque: ${estoque[produto]}`;
-      if (estoque[produto] <= 0) {
-        document.getElementById(`btn-${produto}`).disabled = true;
-      }
+  function logout() {
+    localStorage.removeItem('usuario_logado');
+    window.location.href = "index.html";
+  }
+
+  window.onload = () => {
+    document.getElementById('total-moedas').innerText = moedas;
+    for (let produto in estoque) {
+      atualizarEstoque(produto);
     }
-
-    // Função para comprar produto
-    function comprarProduto(preco, produto) {
-      if (moedas >= preco && estoque[produto] > 0) {
-        moedas -= preco;
-        estoque[produto]--;
-        localStorage.setItem(nomeUsuario + '_mrcoin', moedas);
-        document.getElementById('total-moedas').innerText = moedas;
-        atualizarEstoque(produto);
-        alert("Você comprou o " + produto + " com sucesso!");
-      } else {
-        alert("Você não tem moedas suficientes ou o estoque acabou.");
-      }
-    }
-
-    function logout() {
-      localStorage.removeItem('usuario_logado');
-      window.location.href = "index.html";
-    }
-
-    window.onload = () => {
-      document.getElementById('total-moedas').innerText = moedas;
-      for (let produto in estoque) {
-        atualizarEstoque(produto);
-      }
-    };
-  </script>
+  };
+</script>
 </body>
 </html>

@@ -155,6 +155,7 @@
       
       if (usuario) {
         alert("Login bem-sucedido!");
+        localStorage.setItem('usuario_logado', username); // Salva o usuário logado
         window.location.href = "loja.html";  // Redireciona para a página da loja
       } else {
         alert("Email ou senha incorretos.");
