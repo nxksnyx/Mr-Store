@@ -91,10 +91,10 @@ function logout() {
 }
 
 window.onload = () => {
-    const user = getCookie("usuario_logado");
+    const user = getCookie("usuario_logado");  // Verifica se o usuário está logado com o cookie
     if (!user) {
         alert("Você precisa estar logado!");
-        window.location.href = "index.html";
+        window.location.href = "index.html";  // Se não estiver logado, redireciona para o login
     } else {
         document.getElementById("nome-usuario").innerText = user;
         carregarEstado();

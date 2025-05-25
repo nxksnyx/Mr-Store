@@ -94,88 +94,72 @@
   </div>
 
   <script>
-    // Função para criar o cookie
-    function setCookie(name, value, days) {
-      const d = new Date();
-      d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000)); // Expiração em dias
-      let expires = "expires=" + d.toUTCString();
-      document.cookie = name + "=" + value + ";" + expires + ";path=/";
-    }
-
-    // Função para obter o valor de um cookie
+    // Função para pegar o cookie de login
     function getCookie(name) {
-      let nameEQ = name + "=";
-      let ca = document.cookie.split(';');
-      for (let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-      }
-      return null;
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
     }
 
-    // Exibir a tela de cadastro
+    window.onload = () => {
+        const user = getCookie("usuario_logado");
+
+        if (user) {
+            // Se o usuário estiver logado (cookie presente), redireciona para a loja
+            window.location.href = "loja.html";
+        }
+    };
+
+    // Funções de login e cadastro (sem Firebase)
     function mostrarCadastro() {
-      document.getElementById('cadastro-container').style.display = 'block';
-      document.getElementById('login-container').style.display = 'none';
+        document.getElementById('cadastro-container').style.display = 'block';
+        document.getElementById('login-container').style.display = 'none';
     }
 
-    // Exibir a tela de login
     function mostrarLogin() {
-      document.getElementById('cadastro-container').style.display = 'none';
-      document.getElementById('login-container').style.display = 'block';
+        document.getElementById('cadastro-container').style.display = 'none';
+        document.getElementById('login-container').style.display = 'block';
     }
 
-    // Fazer login do usuário
     function fazerLogin() {
-      const username = document.getElementById('login-username').value;
-      const password = document.getElementById('login-password').value;
+        const username = document.getElementById('login-username').value;
+        const password = document.getElementById('login-password').value;
+        const usuario = JSON.parse(localStorage.getItem(username));
 
-      const usuario = JSON.parse(localStorage.getItem(username));
-
-      if (usuario && usuario.senha === password) {
-        alert("Login bem-sucedido!");
-        setCookie("usuario_logado", username, 30); // Salvar cookie por 30 dias
-        window.location.href = "loja.html"; // Redirecionar para a página de loja
-      } else {
-        alert("Usuário ou senha incorretos!");
-      }
+        if (usuario && usuario.senha === password) {
+            alert("Login bem-sucedido!");
+            // Cria o cookie para lembrar o login
+            document.cookie = `usuario_logado=${username}; path=/; max-age=3600`;  // Cookie expira em 1 hora
+            localStorage.setItem("usuario_logado", username);
+            window.location.href = "loja.html";  // Redirecionar para a página de loja
+        } else {
+            alert("Usuário ou senha incorretos!");
+        }
     }
 
-    // Fazer cadastro de um novo usuário
     function fazerCadastro() {
-      const username = document.getElementById('cadastro-username').value;
-      const password = document.getElementById('cadastro-password').value;
+        const username = document.getElementById('cadastro-username').value;
+        const password = document.getElementById('cadastro-password').value;
 
-      if (localStorage.getItem(username)) {
-        alert("Usuário já existe. Tente outro nome.");
-        return;
-      }
+        if (localStorage.getItem(username)) {
+            alert("Usuário já existe. Tente outro nome.");
+            return;
+        }
 
-      const novoUsuario = {
-        username: username,
-        senha: password
-      };
+        const novoUsuario = {
+            username: username,
+            senha: password
+        };
 
-      localStorage.setItem(username, JSON.stringify(novoUsuario));
-      alert("Cadastro realizado com sucesso!");
-      setCookie("usuario_logado", username, 30); // Salvar cookie por 30 dias
-      window.location.href = "loja.html"; // Redirecionar para a página de loja
+        localStorage.setItem(username, JSON.stringify(novoUsuario));
+        alert("Cadastro realizado com sucesso!");
+        document.cookie = `usuario_logado=${username}; path=/; max-age=3600`;  // Cria o cookie para o login
+        localStorage.setItem("usuario_logado", username);
+        window.location.href = "loja.html"; // Redirecionar para a página de loja
     }
+</script>
 
-    // Verificar se já existe um usuário logado
-   window.onload = () => {
-    const user = getCookie("usuario_logado");
-    if (!user) {
-        // Se não tiver cookie de login, exibe a tela de login
-        alert("Você precisa estar logado!");
-    } else {
-        // Se tiver o cookie, redireciona para a loja
-        window.location.href = "loja.html";
-    }
-};
-
-  </script>
 
 </body>
 </html>
