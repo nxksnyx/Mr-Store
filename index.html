@@ -76,6 +76,80 @@
       font-weight: bold;
     }
   </style>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
+  <script>
+    // Configuração do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCh9xX0Py_J6xiCOxEGnZS0Pwnha8OZwmw",
+      authDomain: "mrstore-6b888.firebaseapp.com",
+      projectId: "mrstore-6b888",
+      storageBucket: "mrstore-6b888.firebasestorage.app",
+      messagingSenderId: "387627289090",
+      appId: "1:387627289090:web:da4ca1f58ad9ce0354b51b"
+    };
+
+    // Inicializar o Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
+
+    // Funções de login e cadastro
+    function mostrarCadastro() {
+      document.getElementById('cadastro-container').style.display = 'block';
+      document.getElementById('login-container').style.display = 'none';
+    }
+
+    function mostrarLogin() {
+      document.getElementById('cadastro-container').style.display = 'none';
+      document.getElementById('login-container').style.display = 'block';
+    }
+
+    function fazerLogin() {
+      const username = document.getElementById('login-username').value;
+      const password = document.getElementById('login-password').value;
+
+      const userRef = database.ref('usuarios/' + username);
+      userRef.once('value').then(snapshot => {
+        const usuario = snapshot.val();
+        if (usuario && usuario.senha === password) {
+          alert("Login bem-sucedido!");
+          localStorage.setItem("usuario_logado", username);
+          window.location.href = "loja.html";
+        } else {
+          alert("Usuário ou senha incorretos!");
+        }
+      });
+    }
+
+    function fazerCadastro() {
+      const username = document.getElementById('cadastro-username').value;
+      const password = document.getElementById('cadastro-password').value;
+
+      const userRef = database.ref('usuarios/' + username);
+      userRef.once('value').then(snapshot => {
+        if (snapshot.exists()) {
+          alert("Usuário já existe. Tente outro nome.");
+          return;
+        }
+
+        const novoUsuario = {
+          username: username,
+          senha: password
+        };
+
+        userRef.set(novoUsuario);
+        alert("Cadastro realizado com sucesso!");
+        localStorage.setItem("usuario_logado", username);
+        window.location.href = "loja.html";
+      });
+    }
+  </script>
+
 </head>
 <body>
   <div class="header">
@@ -100,52 +174,5 @@
     <button onclick="fazerCadastro()">Cadastrar</button>
     <p>Já tem uma conta? <a onclick="mostrarLogin()">Fazer login</a></p>
   </div>
-
-  <script>
-    // Funções de login e cadastro
-    function mostrarCadastro() {
-        document.getElementById('cadastro-container').style.display = 'block';
-        document.getElementById('login-container').style.display = 'none';
-    }
-
-    function mostrarLogin() {
-        document.getElementById('cadastro-container').style.display = 'none';
-        document.getElementById('login-container').style.display = 'block';
-    }
-
-    function fazerLogin() {
-        const username = document.getElementById('login-username').value;
-        const password = document.getElementById('login-password').value;
-        const usuario = JSON.parse(localStorage.getItem(username));
-
-        if (usuario && usuario.senha === password) {
-            alert("Login bem-sucedido!");
-            localStorage.setItem("usuario_logado", username);
-            window.location.href = "loja.html";
-        } else {
-            alert("Usuário ou senha incorretos!");
-        }
-    }
-
-    function fazerCadastro() {
-        const username = document.getElementById('cadastro-username').value;
-        const password = document.getElementById('cadastro-password').value;
-
-        if (localStorage.getItem(username)) {
-            alert("Usuário já existe. Tente outro nome.");
-            return;
-        }
-
-        const novoUsuario = {
-            username: username,
-            senha: password
-        };
-
-        localStorage.setItem(username, JSON.stringify(novoUsuario));
-        alert("Cadastro realizado com sucesso!");
-        localStorage.setItem("usuario_logado", username);
-        window.location.href = "loja.html";
-    }
-  </script>
 </body>
 </html>
