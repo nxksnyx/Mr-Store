@@ -63,7 +63,7 @@
     }
 
     .header img {
-      width: 150px;
+      width: 150px; /* Tamanho da imagem ajustado */
       margin-top: 10px;
     }
   </style>
@@ -96,22 +96,25 @@
   <script>
     // Função para pegar o cookie de login
     function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
-        return null;
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
     }
 
     window.onload = () => {
         const user = getCookie("usuario_logado");
 
         if (user) {
-            // Se o usuário estiver logado (cookie presente), redireciona para a loja
+            // Se o usuário estiver logado, redireciona para a loja
             window.location.href = "loja.html";
+        } else {
+            // Se não estiver logado, exibe a tela de login
+            document.getElementById('login-container').style.display = 'block';
+            document.getElementById('cadastro-container').style.display = 'none';
         }
     };
 
-    // Funções de login e cadastro (sem Firebase)
     function mostrarCadastro() {
         document.getElementById('cadastro-container').style.display = 'block';
         document.getElementById('login-container').style.display = 'none';
@@ -132,7 +135,7 @@
             // Cria o cookie para lembrar o login
             document.cookie = `usuario_logado=${username}; path=/; max-age=3600`;  // Cookie expira em 1 hora
             localStorage.setItem("usuario_logado", username);
-            window.location.href = "loja.html";  // Redirecionar para a página de loja
+            window.location.href = "loja.html";  // Redireciona para a página de loja
         } else {
             alert("Usuário ou senha incorretos!");
         }
@@ -156,10 +159,9 @@
         alert("Cadastro realizado com sucesso!");
         document.cookie = `usuario_logado=${username}; path=/; max-age=3600`;  // Cria o cookie para o login
         localStorage.setItem("usuario_logado", username);
-        window.location.href = "loja.html"; // Redirecionar para a página de loja
+        window.location.href = "loja.html"; // Redireciona para a página de loja
     }
-</script>
-
+  </script>
 
 </body>
 </html>

@@ -5,16 +5,30 @@ let estoqueDias = 50;
 let estoqueBala = 200;
 
 // Função para obter o cookie
+// Função para pegar o cookie de login
 function getCookie(name) {
-    let nameEQ = name + "=";
-    let ca = document.cookie.split(';');
-    for (let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-    }
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
     return null;
 }
+
+window.onload = () => {
+    const user = getCookie("usuario_logado");
+
+    if (!user) {
+        // Se não estiver logado, redireciona para a página de login
+        alert("Você precisa estar logado!");
+        window.location.href = "index.html";
+    } else {
+        // Exibe o nome de usuário na loja
+        document.getElementById("nome-usuario").innerText = user;
+        carregarEstado();
+    }
+};
+
+// O restante do código para manipular o estado, compras, etc., permanece o mesmo.
+
 
 // Carregar estado (moedas e estoque)
 function carregarEstado() {
@@ -80,15 +94,12 @@ function comprarProduto(preco, tipo) {
 }
 
 function logout() {
-    // Remove o cookie de login
-    document.cookie = "usuario_logado=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-
-    // Remove o item do localStorage (se necessário)
+    // Limpa o cookie de login
+    document.cookie = "usuario_logado=; path=/; max-age=0";  // Apaga o cookie
     localStorage.removeItem("usuario_logado");
-
-    // Redireciona para a página de login
-    window.location.href = "index.html";
+    window.location.href = "index.html";  // Redireciona para a página de login
 }
+
 
 window.onload = () => {
     const user = getCookie("usuario_logado");  // Verifica se o usuário está logado com o cookie
