@@ -77,7 +77,7 @@
   <!-- Login -->
   <div class="form-container" id="login-container">
     <h2>Login</h2>
-    <input type="text" id="login-username" placeholder="Nome de usuário">
+    <input type="email" id="login-username" placeholder="Email">
     <input type="password" id="login-password" placeholder="Senha">
     <button onclick="fazerLogin()">Entrar</button>
     <p>Não tem uma conta? <a onclick="mostrarCadastro()">Cadastre-se</a></p>
@@ -86,7 +86,7 @@
   <!-- Cadastro -->
   <div class="form-container" id="cadastro-container" style="display: none;">
     <h2>Cadastro</h2>
-    <input type="text" id="cadastro-username" placeholder="Nome de usuário">
+    <input type="email" id="cadastro-username" placeholder="Email">
     <input type="password" id="cadastro-password" placeholder="Senha">
     <button onclick="fazerCadastro()">Cadastrar</button>
     <p>Já tem uma conta? <a onclick="mostrarLogin()">Fazer login</a></p>
@@ -131,35 +131,33 @@
     };
 
     // Login com Firebase
-    function fazerLogin() {
+    async function fazerLogin() {
       const username = document.getElementById('login-username').value;
       const password = document.getElementById('login-password').value;
 
-      auth.signInWithEmailAndPassword(username, password)
-        .then((userCredential) => {
-          alert("Login bem-sucedido!");
-          localStorage.setItem("usuario_logado", userCredential.user.email);
-          window.location.href = "loja.html";
-        })
-        .catch((error) => {
-          alert("Erro: " + error.message);
-        });
+      try {
+        const userCredential = await auth.signInWithEmailAndPassword(username, password);
+        alert("Login bem-sucedido!");
+        localStorage.setItem("usuario_logado", userCredential.user.email);
+        window.location.href = "loja.html";
+      } catch (error) {
+        alert("Erro: " + error.message);
+      }
     }
 
     // Cadastro com Firebase
-    function fazerCadastro() {
+    async function fazerCadastro() {
       const username = document.getElementById('cadastro-username').value;
       const password = document.getElementById('cadastro-password').value;
 
-      auth.createUserWithEmailAndPassword(username, password)
-        .then((userCredential) => {
-          alert("Cadastro realizado com sucesso!");
-          localStorage.setItem("usuario_logado", userCredential.user.email);
-          window.location.href = "loja.html";
-        })
-        .catch((error) => {
-          alert("Erro: " + error.message);
-        });
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(username, password);
+        alert("Cadastro realizado com sucesso!");
+        localStorage.setItem("usuario_logado", userCredential.user.email);
+        window.location.href = "loja.html";
+      } catch (error) {
+        alert("Erro: " + error.message);
+      }
     }
   </script>
 </body>

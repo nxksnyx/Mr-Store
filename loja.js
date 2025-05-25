@@ -18,16 +18,15 @@ function verificarLogin() {
 }
 
 // Função de logout
-function logout() {
-    firebase.auth().signOut()
-        .then(() => {
-            alert("Logout bem-sucedido!");
-            localStorage.removeItem("usuario_logado");
-            window.location.href = "index.html";  // Redireciona para o login
-        })
-        .catch((error) => {
-            alert("Erro ao sair: " + error.message);
-        });
+async function logout() {
+    try {
+        await firebase.auth().signOut();
+        alert("Logout bem-sucedido!");
+        localStorage.removeItem("usuario_logado");
+        window.location.href = "index.html";  // Redireciona para o login
+    } catch (error) {
+        alert("Erro ao sair: " + error.message);
+    }
 }
 
 window.onload = verificarLogin;
@@ -52,45 +51,4 @@ function salvarEstado() {
 
 function atualizarTotal() {
     document.getElementById('total-moedas').innerText = moedas;
-}
-
-function ganharMoeda() {
-    moedas += 1;
-    atualizarTotal();
-    salvarEstado();
-}
-
-function comprarProduto(preco, tipo) {
-    if (moedas < preco) {
-        alert("Você não tem Mrcoin suficiente!");
-        return;
-    }
-
-    switch (tipo) {
-        case 'bola':
-            if (estoqueBola <= 0) return alert("Produto fora de estoque!");
-            estoqueBola--;
-            document.getElementById('estoque-bola').innerText = "Estoque: " + estoqueBola;
-            break;
-        case 'aula':
-            if (estoqueAula <= 0) return alert("Produto fora de estoque!");
-            estoqueAula--;
-            document.getElementById('estoque-aula').innerText = "Estoque: " + estoqueAula;
-            break;
-        case 'dias':
-            if (estoqueDias <= 0) return alert("Produto fora de estoque!");
-            estoqueDias--;
-            document.getElementById('estoque-dias').innerText = "Estoque: " + estoqueDias;
-            break;
-        case 'bala':
-            if (estoqueBala <= 0) return alert("Produto fora de estoque!");
-            estoqueBala--;
-            document.getElementById('estoque-bala').innerText = "Estoque: " + estoqueBala;
-            break;
-    }
-
-    moedas -= preco;
-    atualizarTotal();
-    salvarEstado();
-    alert("Compra realizada com sucesso!");
 }
