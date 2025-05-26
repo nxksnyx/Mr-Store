@@ -36,11 +36,6 @@
       border-radius: 5px;
       border: 1px solid #ccc;
       font-size: 1rem;
-      outline: none;
-    }
-    input:focus {
-      border-color: #FFD700;
-      box-shadow: 0 0 5px #FFD700;
     }
     button {
       background-color: #FFD700;
@@ -51,15 +46,10 @@
       cursor: pointer;
       font-weight: bold;
       margin-top: 10px;
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: #e6c200;
     }
     a {
       color: #FFD700;
       cursor: pointer;
-      text-decoration: underline;
     }
   </style>
 </head>
@@ -69,42 +59,47 @@
     <img src="https://i.imgur.com/9Thbwqj.png" alt="Logo" width="150" />
   </div>
 
-  <div class="form-container" role="form" aria-labelledby="form-title">
+  <div class="form-container">
     <h2 id="form-title">Cadastro</h2>
-    <input type="email" id="email" placeholder="E-mail" aria-label="E-mail" />
-    <input type="password" id="password" placeholder="Senha" aria-label="Senha" />
-    <button id="action-btn">Cadastrar</button>
+    <form id="auth-form">
+      <input type="email" id="email" placeholder="E-mail" required />
+      <input type="password" id="password" placeholder="Senha" required />
+      <button type="submit">Cadastrar</button>
+    </form>
     <p>Já tem uma conta? <a id="toggle-link">Fazer login</a></p>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js" defer></script>
-  <script defer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
+  <script>
     document.addEventListener('DOMContentLoaded', () => {
       const supabaseUrl = 'https://iydzusoiaikkvpnnkpbh.supabase.co';
       const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZHp1c29pYWlra3Zwbm5rcGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgyOTg1MzgsImV4cCI6MjA2Mzg3NDUzOH0.oThN1XatHGyr1ic0I1VY8v8GYf9UKjx8Pg2Rl6R4Du0';
 
       const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
 
-      const title = document.getElementById('form-title');
-      const btn = document.getElementById('action-btn');
-      const link = document.getElementById('toggle-link');
+      const form = document.getElementById('auth-form');
+      const formTitle = document.getElementById('form-title');
+      const toggleLink = document.getElementById('toggle-link');
+      const submitBtn = form.querySelector('button');
 
-      function toggleForm() {
-        if (title.innerText === 'Cadastro') {
-          title.innerText = 'Login';
-          btn.innerText = 'Entrar';
-          link.innerText = 'Cadastrar';
+      toggleLink.addEventListener('click', () => {
+        if (formTitle.innerText === 'Cadastro') {
+          formTitle.innerText = 'Login';
+          submitBtn.innerText = 'Entrar';
+          toggleLink.innerText = 'Cadastrar';
         } else {
-          title.innerText = 'Cadastro';
-          btn.innerText = 'Cadastrar';
-          link.innerText = 'Fazer login';
+          formTitle.innerText = 'Cadastro';
+          submitBtn.innerText = 'Cadastrar';
+          toggleLink.innerText = 'Fazer login';
         }
-      }
+      });
 
-      async function processarAuth() {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value.trim();
-        const isLogin = title.innerText === 'Login';
+        const isLogin = formTitle.innerText === 'Login';
 
         if (!email || !password) {
           alert('Preencha email e senha.');
@@ -114,11 +109,12 @@
         if (isLogin) {
           // Login
           const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
           if (error) {
             alert('Erro no login: ' + error.message);
             return;
           }
-          // Login OK - redireciona
+
           if (email.toLowerCase() === 'sandrachefa@gmail.com') {
             window.location.href = 'admin.html';
           } else {
@@ -127,22 +123,21 @@
         } else {
           // Cadastro
           const { data, error } = await supabase.auth.signUp({ email, password });
+
           if (error) {
             alert('Erro no cadastro: ' + error.message);
             return;
           }
+
           alert('Cadastro realizado! Por favor, verifique seu e-mail para confirmar sua conta.');
-          // Só redireciona após confirmação do e-mail (você pode ajustar isso conforme sua lógica)
+
           if (email.toLowerCase() === 'sandrachefa@gmail.com') {
             window.location.href = 'admin.html';
           } else {
             window.location.href = 'loja.html';
           }
         }
-      }
-
-      btn.addEventListener('click', processarAuth);
-      link.addEventListener('click', toggleForm);
+      });
     });
   </script>
 </body>
