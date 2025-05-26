@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MrStore - Cadastro/Login</title>
   <style>
     body {
@@ -19,11 +19,9 @@
       align-items: center;
       color: white;
     }
-
     .header {
       text-align: center;
     }
-
     .form-container {
       background: rgba(0, 0, 0, 0.7);
       padding: 20px;
@@ -33,14 +31,12 @@
       gap: 10px;
       width: 300px;
     }
-
     input {
       padding: 10px;
       border-radius: 5px;
       border: 1px solid #ccc;
       font-size: 1rem;
     }
-
     button {
       background-color: #FFD700;
       color: black;
@@ -51,7 +47,6 @@
       font-weight: bold;
       margin-top: 10px;
     }
-
     a {
       color: #FFD700;
       cursor: pointer;
@@ -72,69 +67,72 @@
     <p>Já tem uma conta? <a onclick="toggleForm()">Fazer login</a></p>
   </div>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBFiGU-blNt7XFO9cjYPoWaPP-c5EEItfc",
-      authDomain: "mrstore-d429f.firebaseapp.com",
-      projectId: "mrstore-d429f",
-      storageBucket: "mrstore-d429f.appspot.com",
-      messagingSenderId: "310913725702",
-      appId: "1:310913725702:web:22775b2fa034b0697e1a87"
-    };
+    const supabaseUrl = 'https://iydzusoiaikkvpnnkpbh.supabase.co'
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZHp1c29pYWlra3Zwbm5rcGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgyOTg1MzgsImV4cCI6MjA2Mzg3NDUzOH0.oThN1XatHGyr1ic0I1VY8v8GYf9UKjx8Pg2Rl6R4Du0'
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+    const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey)
 
     function toggleForm() {
-      const title = document.getElementById('form-title');
-      const btn = document.querySelector('button');
-      const link = document.querySelector('a');
+      const title = document.getElementById('form-title')
+      const btn = document.querySelector('button')
+      const link = document.querySelector('a')
 
       if (title.innerText === 'Cadastro') {
-        title.innerText = 'Login';
-        btn.innerText = 'Entrar';
-        link.innerText = 'Cadastrar';
+        title.innerText = 'Login'
+        btn.innerText = 'Entrar'
+        link.innerText = 'Cadastrar'
       } else {
-        title.innerText = 'Cadastro';
-        btn.innerText = 'Cadastrar';
-        link.innerText = 'Fazer login';
+        title.innerText = 'Cadastro'
+        btn.innerText = 'Cadastrar'
+        link.innerText = 'Fazer login'
       }
     }
 
-    function processarAuth() {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const isLogin = document.getElementById('form-title').innerText === 'Login';
+    async function processarAuth() {
+      const email = document.getElementById('email').value.trim()
+      const password = document.getElementById('password').value.trim()
+      const isLogin = document.getElementById('form-title').innerText === 'Login'
 
       if (!email || !password) {
-        alert("Preencha email e senha.");
-        return;
+        alert('Preencha email e senha.')
+        return
       }
 
       if (isLogin) {
-        auth.signInWithEmailAndPassword(email, password)
-          .then(() => {
-            if(email.toLowerCase() === "sandrachefa@gmail.com") {
-              window.location.href = "admin.html";
-            } else {
-              window.location.href = "loja.html";
-            }
-          })
-          .catch(err => alert('Erro no login: ' + err.message));
+        // Login
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+
+        if (error) {
+          alert('Erro no login: ' + error.message)
+          return
+        }
+
+        // Login ok, redireciona de acordo com o email
+        if (email.toLowerCase() === 'sandrachefa@gmail.com') {
+          window.location.href = 'admin.html'
+        } else {
+          window.location.href = 'loja.html'
+        }
       } else {
-        auth.createUserWithEmailAndPassword(email, password)
-          .then(() => {
-            if(email.toLowerCase() === "sandrachefa@gmail.com") {
-              window.location.href = "admin.html";
-            } else {
-              window.location.href = "loja.html";
-            }
-          })
-          .catch(err => alert('Erro no cadastro: ' + err.message));
+        // Cadastro
+        const { data, error } = await supabase.auth.signUp({ email, password })
+
+        if (error) {
+          alert('Erro no cadastro: ' + error.message)
+          return
+        }
+
+        alert('Cadastro realizado! Por favor, verifique seu e-mail para confirmar sua conta.')
+
+        // Você pode optar por redirecionar direto após cadastro, ou esperar confirmação de email.
+        // Aqui vamos redirecionar direto para a loja:
+        if (email.toLowerCase() === 'sandrachefa@gmail.com') {
+          window.location.href = 'admin.html'
+        } else {
+          window.location.href = 'loja.html'
+        }
       }
     }
   </script>
