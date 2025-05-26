@@ -1,3 +1,0 @@
-git add .
-git commit -m "Adicionando os arquivos do site"
-git push origin main
