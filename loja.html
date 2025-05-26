@@ -116,7 +116,6 @@
     }
 
     async function carregarDadosUsuario() {
-      // Buscar dados no Supabase (tabela 'usuarios')
       const { data, error } = await supabase
         .from('usuarios')
         .select('moedas, estoque')
@@ -124,7 +123,6 @@
         .single()
 
       if (error && error.code === 'PGRST116') {
-        // Nenhum registro ainda, cria
         await supabase.from('usuarios').insert({ email: usuarioAtual.email, moedas: 0, estoque: {} })
         moedas = 0
         estoque = {}
@@ -152,51 +150,60 @@
 
         div.innerHTML = `
           <img src="${prod.img}" alt="${prod.nome}" />
-          <strong>${prod.nome}</strong><br />
-          Preço: ${prod.preco} Mrcoins<br />
-          <button ${moedas < prod.preco ? 'disabled' : ''} onclick="comprar('${prod.id}')">
-            Comprar
-          </button><br/>
-          <small>Quantidade: ${qtdComprada}</small>
+          <h4>${prod.nome}</h4>
+          <p>Preço: ${prod.preco} Mrcoin</p>
+          <p>Quantidade: ${qtdComprada}</p>
+          <button ${moedas < prod.preco ? 'disabled' : ''} onclick="comprarProduto('${prod.id}')">Comprar</button>
         `
         container.appendChild(div)
       })
     }
 
-    async function comprar(id) {
+    async function comprarProduto(id) {
       const produto = produtos.find(p => p.id === id)
-      if (!produto) return alert('Produto não encontrado.')
+      if (!produto) return
 
-      if (moedas < produto.preco) return alert('Saldo insuficiente.')
+      if (moedas < produto.preco) {
+        alert('Moedas insuficientes')
+        return
+      }
 
       moedas -= produto.preco
-      estoque[id] = (estoque[id] || 0) + 1
+      estoque[id] = (estoque[id] ?? 0) + 1
 
-      await salvarDados()
+      const { error } = await supabase
+        .from('usuarios')
+        .update({ moedas, estoque })
+        .eq('email', usuarioAtual.email)
 
+      if (error) {
+        alert('Erro ao atualizar dados: ' + error.message)
+        return
+      }
+
+      alert(`Você comprou 1 ${produto.nome}!`)
       mostrarProdutos()
       atualizarTotal()
-      alert(`Você comprou: ${produto.nome}!`)
+    }
+
+    async function ganharMoeda() {
+      moedas += 1
+      const { error } = await supabase
+        .from('usuarios')
+        .update({ moedas })
+        .eq('email', usuarioAtual.email)
+
+      if (error) {
+        alert('Erro ao atualizar moedas: ' + error.message)
+        return
+      }
+
+      atualizarTotal()
+      mostrarProdutos()
     }
 
     function atualizarTotal() {
       document.getElementById('total-moedas').textContent = moedas
-    }
-
-    async function salvarDados() {
-      const { error } = await supabase
-        .from('usuarios')
-        .update({ moedas: moedas, estoque: estoque })
-        .eq('email', usuarioAtual.email)
-
-      if (error) alert('Erro ao salvar dados: ' + error.message)
-    }
-
-    async function ganharMoeda() {
-      moedas++
-      await salvarDados()
-      atualizarTotal()
-      mostrarProdutos()
     }
 
     async function logout() {
