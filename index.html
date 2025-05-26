@@ -1,149 +1,130 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MrStore - Cadastro/Login</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-image: url('https://i.imgur.com/sI8LmKe.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      min-height: 100vh;
-      margin: 0;
-      padding: 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: white;
-    }
-    .header {
-      text-align: center;
-    }
-    .form-container {
-      background: rgba(0, 0, 0, 0.7);
-      padding: 20px;
-      border-radius: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 300px;
-    }
-    input {
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-    }
-    button {
-      background-color: #FFD700;
-      color: black;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-    a {
-      color: #FFD700;
-      cursor: pointer;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MrStore - Cadastro/Login</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: url('https://i.imgur.com/sI8LmKe.png') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .container {
+    background: rgba(0,0,0,0.75);
+    padding: 30px;
+    border-radius: 10px;
+    width: 320px;
+    text-align: center;
+  }
+  input {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 6px;
+    border: none;
+    font-size: 1rem;
+  }
+  button {
+    padding: 10px 20px;
+    background: gold;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  a {
+    color: gold;
+    cursor: pointer;
+    display: block;
+    margin-top: 15px;
+  }
+</style>
 </head>
 <body>
-  <div class="header">
-    <h1>Bem-vindo à MrStore!</h1>
-    <img src="https://i.imgur.com/9Thbwqj.png" alt="Logo" width="150" />
-  </div>
 
-  <div class="form-container">
-    <h2 id="form-title">Cadastro</h2>
-    <form id="auth-form">
-      <input type="email" id="email" placeholder="E-mail" autocomplete="email" required />
-      <input type="password" id="password" placeholder="Senha" autocomplete="new-password" required />
-      <button type="submit">Cadastrar</button>
-    </form>
-    <p>Já tem uma conta? <a id="toggle-link">Fazer login</a></p>
-  </div>
+<div class="container">
+  <h2 id="form-title">Cadastro</h2>
+  <input type="email" id="email" placeholder="E-mail" />
+  <input type="password" id="password" placeholder="Senha" />
+  <button id="submit-btn">Cadastrar</button>
+  <a id="toggle-link">Já tem uma conta? Fazer login</a>
+  <p id="message" style="color: yellow; margin-top: 10px;"></p>
+</div>
 
-  <!-- Supabase JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
+<script>
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const submitBtn = document.getElementById('submit-btn');
+  const toggleLink = document.getElementById('toggle-link');
+  const formTitle = document.getElementById('form-title');
+  const message = document.getElementById('message');
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Inicializa Supabase
-      const supabaseUrl = 'https://iydzusoiaikkvpnnkpbh.supabase.co';
-      const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5ZHp1c29pYWlra3Zwbm5rcGJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgyOTg1MzgsImV4cCI6MjA2Mzg3NDUzOH0.oThN1XatHGyr1ic0I1VY8v8GYf9UKjx8Pg2Rl6R4Du0';
+  let isLogin = false;
 
-      const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
+  toggleLink.addEventListener('click', () => {
+    isLogin = !isLogin;
+    if(isLogin) {
+      formTitle.textContent = 'Login';
+      submitBtn.textContent = 'Entrar';
+      toggleLink.textContent = 'Não tem conta? Cadastrar';
+      message.textContent = '';
+    } else {
+      formTitle.textContent = 'Cadastro';
+      submitBtn.textContent = 'Cadastrar';
+      toggleLink.textContent = 'Já tem uma conta? Fazer login';
+      message.textContent = '';
+    }
+  });
 
-      const form = document.getElementById('auth-form');
-      const formTitle = document.getElementById('form-title');
-      const toggleLink = document.getElementById('toggle-link');
-      const submitBtn = form.querySelector('button');
+  submitBtn.addEventListener('click', () => {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
 
-      toggleLink.addEventListener('click', () => {
-        if (formTitle.innerText === 'Cadastro') {
-          formTitle.innerText = 'Login';
-          submitBtn.innerText = 'Entrar';
-          toggleLink.innerText = 'Cadastrar';
-          document.getElementById('password').setAttribute('autocomplete', 'current-password');
-        } else {
-          formTitle.innerText = 'Cadastro';
-          submitBtn.innerText = 'Cadastrar';
-          toggleLink.innerText = 'Fazer login';
-          document.getElementById('password').setAttribute('autocomplete', 'new-password');
-        }
-      });
+    if(!email || !password) {
+      message.textContent = 'Preencha todos os campos!';
+      return;
+    }
 
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    let users = JSON.parse(localStorage.getItem('mrstore_users') || '{}');
 
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value.trim();
-        const isLogin = formTitle.innerText === 'Login';
+    if(isLogin) {
+      // Login
+      if(users[email] && users[email] === password) {
+        // Salva usuário logado
+        localStorage.setItem('mrstore_logged', email);
+        window.location.href = 'loja.html';
+      } else {
+        message.textContent = 'Usuário ou senha inválidos!';
+      }
+    } else {
+      // Cadastro
+      if(users[email]) {
+        message.textContent = 'Esse e-mail já está cadastrado!';
+        return;
+      }
+      users[email] = password;
+      localStorage.setItem('mrstore_users', JSON.stringify(users));
+      // Inicializa moedas para o usuário
+      localStorage.setItem('mrstore_coins_' + email, '10000'); // já começa com 10k Mrcoin
+      message.style.color = 'lightgreen';
+      message.textContent = 'Cadastro feito com sucesso! Agora faça login.';
+      // limpa campos
+      emailInput.value = '';
+      passwordInput.value = '';
+      isLogin = true;
+      formTitle.textContent = 'Login';
+      submitBtn.textContent = 'Entrar';
+      toggleLink.textContent = 'Não tem conta? Cadastrar';
+    }
+  });
+</script>
 
-        if (!email || !password) {
-          alert('Preencha email e senha.');
-          return;
-        }
-
-        if (isLogin) {
-          // Login
-          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-          if (error) {
-            alert('Erro no login: ' + error.message);
-            return;
-          }
-
-          if (email.toLowerCase() === 'sandrachefa@gmail.com') {
-            window.location.href = 'admin.html';
-          } else {
-            window.location.href = 'loja.html';
-          }
-        } else {
-          // Cadastro
-          const { data, error } = await supabase.auth.signUp({ email, password });
-
-          if (error) {
-            alert('Erro no cadastro: ' + error.message);
-            return;
-          }
-
-          alert('Cadastro realizado! Por favor, verifique seu e-mail para confirmar sua conta.');
-
-          if (email.toLowerCase() === 'sandrachefa@gmail.com') {
-            window.location.href = 'admin.html';
-          } else {
-            window.location.href = 'loja.html';
-          }
-        }
-      });
-    });
-  </script>
 </body>
 </html>
