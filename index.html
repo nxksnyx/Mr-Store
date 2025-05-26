@@ -1,9 +1,10 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MrStore - Cadastro / Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MrStore - Cadastro/Login</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -22,11 +23,6 @@
 
     .header {
       text-align: center;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
     }
 
     .form-container {
@@ -61,104 +57,77 @@
       color: #FFD700;
       cursor: pointer;
     }
-
-    .header img {
-      width: 150px;
-      margin-top: 10px;
-    }
   </style>
 </head>
 <body>
   <div class="header">
     <h1>Bem-vindo à MrStore!</h1>
-    <img src="https://i.imgur.com/9Thbwqj.png" alt="Logo">
+    <img src="https://i.imgur.com/9Thbwqj.png" alt="Logo" width="150" />
   </div>
 
-  <!-- Cadastro/Login -->
-  <div class="form-container" id="auth-container">
+  <div class="form-container">
     <h2 id="form-title">Cadastro</h2>
-    <input type="email" id="auth-username" placeholder="E-mail" />
-    <input type="password" id="auth-password" placeholder="Senha" />
+    <input type="email" id="email" placeholder="E-mail" />
+    <input type="password" id="password" placeholder="Senha" />
     <button onclick="processarAuth()">Cadastrar</button>
     <p>Já tem uma conta? <a onclick="toggleForm()">Fazer login</a></p>
   </div>
 
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
   <script>
-    // Alterna entre as telas de Cadastro e Login
+    // Configuração do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBFiGU-blNt7XFO9cjYPoWaPP-c5EEItfc",
+      authDomain: "mrstore-d429f.firebaseapp.com",
+      projectId: "mrstore-d429f",
+      storageBucket: "mrstore-d429f.appspot.com",
+      messagingSenderId: "310913725702",
+      appId: "1:310913725702:web:22775b2fa034b0697e1a87"
+    };
+
+    // Inicializa Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
     function toggleForm() {
-      const formTitle = document.getElementById('form-title');
-      const authButton = document.querySelector('button');
-      const actionText = document.querySelector('p a');
-      
-      const isLogin = formTitle.innerText === "Login";
+      const title = document.getElementById('form-title');
+      const btn = document.querySelector('button');
+      const link = document.querySelector('a');
+
+      if (title.innerText === 'Cadastro') {
+        title.innerText = 'Login';
+        btn.innerText = 'Entrar';
+        link.innerText = 'Cadastrar';
+      } else {
+        title.innerText = 'Cadastro';
+        btn.innerText = 'Cadastrar';
+        link.innerText = 'Fazer login';
+      }
+    }
+
+    function processarAuth() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const isLogin = document.getElementById('form-title').innerText === 'Login';
 
       if (isLogin) {
-        formTitle.innerText = "Cadastro";
-        authButton.innerText = "Cadastrar";
-        actionText.innerText = "Fazer login";
+        auth.signInWithEmailAndPassword(email, password)
+          .then(() => {
+            localStorage.setItem('usuario_logado', email);
+            window.location.href = 'loja.html';
+          })
+          .catch(err => alert('Erro: ' + err.message));
       } else {
-        formTitle.innerText = "Login";
-        authButton.innerText = "Entrar";
-        actionText.innerText = "Cadastrar";
-      }
-    }
-
-    // Função de cadastro/login
-    function processarAuth() {
-      const username = document.getElementById('auth-username').value;
-      const password = document.getElementById('auth-password').value;
-
-      // Verificando se o e-mail e a senha são válidos
-      if (!username || !username.includes('@') || !username.includes('.')) {
-        alert("Por favor, insira um e-mail válido.");
-        return;
-      }
-
-      if (password.length < 6) {
-        alert("A senha deve ter pelo menos 6 caracteres.");
-        return;
-      }
-
-      // Verificando se está em modo de Cadastro ou Login
-      const formTitle = document.getElementById('form-title').innerText;
-
-      if (formTitle === "Cadastro") {
-        cadastrarUsuario(username, password);
-      } else {
-        fazerLogin(username, password);
-      }
-    }
-
-    // Função de cadastro
-    function cadastrarUsuario(username, password) {
-      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
-
-      // Verificando se o e-mail já está cadastrado
-      const usuarioExistente = usuarios.find(user => user.email === username);
-      if (usuarioExistente) {
-        alert("Este e-mail já está cadastrado.");
-        return;
-      }
-
-      // Adicionando o novo usuário
-      usuarios.push({ email: username, password: password });
-      localStorage.setItem('usuarios', JSON.stringify(usuarios));
-      alert("Cadastro realizado com sucesso!");
-      window.location.href = "loja.html";  // Redireciona para a página da loja
-    }
-
-    // Função de login
-    function fazerLogin(username, password) {
-      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
-      
-      const usuario = usuarios.find(user => user.email === username && user.password === password);
-      
-      if (usuario) {
-        alert("Login bem-sucedido!");
-        localStorage.setItem('usuario_logado', username); // Salva o usuário logado
-        window.location.href = "loja.html";  // Redireciona para a página da loja
-      } else {
-        alert("Email ou senha incorretos.");
+        auth.createUserWithEmailAndPassword(email, password)
+          .then(() => {
+            localStorage.setItem('usuario_logado', email);
+            window.location.href = 'loja.html';
+          })
+          .catch(err => alert('Erro: ' + err.message));
       }
     }
   </script>
