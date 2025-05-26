@@ -75,10 +75,8 @@
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <script>
-    // Configuração do Firebase (já fornecida)
     const firebaseConfig = {
       apiKey: "AIzaSyBFiGU-blNt7XFO9cjYPoWaPP-c5EEItfc",
       authDomain: "mrstore-d429f.firebaseapp.com",
@@ -88,12 +86,9 @@
       appId: "1:310913725702:web:22775b2fa034b0697e1a87"
     };
 
-    // Inicializa Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const db = firebase.firestore();  // Inicializando Firestore
 
-    // Alterna entre formulários Cadastro e Login
     function toggleForm() {
       const title = document.getElementById('form-title');
       const btn = document.querySelector('button');
@@ -110,7 +105,6 @@
       }
     }
 
-    // Função principal para processar login ou cadastro
     function processarAuth() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
@@ -122,10 +116,8 @@
       }
 
       if (isLogin) {
-        // Login
         auth.signInWithEmailAndPassword(email, password)
           .then(() => {
-            // Redireciona admin para painel admin
             if(email.toLowerCase() === "sandrachefa@gmail.com") {
               window.location.href = "admin.html";
             } else {
@@ -134,23 +126,13 @@
           })
           .catch(err => alert('Erro no login: ' + err.message));
       } else {
-        // Cadastro
         auth.createUserWithEmailAndPassword(email, password)
-          .then(userCredential => {
-            const user = userCredential.user;
-
-            // Criar documento na coleção 'usuarios' com mrcoins 0
-            return db.collection('usuarios').doc(user.uid).set({
-              email: user.email,
-              mrcoins: 0
-            }).then(() => {
-              // Redireciona admin para painel admin
-              if(user.email.toLowerCase() === "sandrachefa@gmail.com") {
-                window.location.href = "admin.html";
-              } else {
-                window.location.href = "loja.html";
-              }
-            });
+          .then(() => {
+            if(email.toLowerCase() === "sandrachefa@gmail.com") {
+              window.location.href = "admin.html";
+            } else {
+              window.location.href = "loja.html";
+            }
           })
           .catch(err => alert('Erro no cadastro: ' + err.message));
       }
