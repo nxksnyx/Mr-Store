@@ -81,7 +81,6 @@
   <div class="container">
     <div class="product-list" id="product-list">
       <h3>Produtos disponíveis</h3>
-      <!-- Produtos serão carregados aqui via JS -->
     </div>
 
     <div class="total">
@@ -114,7 +113,6 @@
     let moedas = 0;
     let estoque = {};
 
-    // Lista de produtos (com preço e id para manipulação)
     const produtos = [
       { id: 'bola-nike', nome: 'Bola da Nike', preco: 5000, img: 'https://static.netshoes.com.br/produtos/bola-de-futebol-campo-nike-merlin-cbf/14/HZM-2881-114/HZM-2881-114_zoom2.jpg' },
       { id: 'jogos', nome: 'Aula com jogos e brincadeiras na área externa', preco: 1000, img: 'https://2.bp.blogspot.com/-c68QkhR3hRc/UFcYdZ8ezrI/AAAAAAAACAQ/8nrWUMt3_iI/s1600/P%C3%A1tio+-+flores+(5).JPG' },
@@ -126,21 +124,18 @@
       { id: 'cinema', nome: 'Aula de cinema com pipoca na sala', preco: 1000, img: 'https://2.bp.blogspot.com/-goes4lu3wsQ/VTl7mzY2lpI/AAAAAAAAGR0/By2X6yTVvZk/s1600/crian%C3%A7as-filmes.jpg' }
     ];
 
-    // Quando usuário logar, carregar dados e escutar alterações do saldo e estoque em tempo real
     auth.onAuthStateChanged(user => {
       if (user) {
         usuarioAtual = user;
         document.getElementById('nome-usuario').innerText = user.email;
 
-        // Escuta mudanças em tempo real do documento do usuário
-        db.collection('usuarios').doc(usuarioAtual.uid)
+        db.collection('usuarios').doc(user.uid)
           .onSnapshot(doc => {
             if (doc.exists) {
               const data = doc.data();
               moedas = data.moedas || 0;
               estoque = data.estoque || {};
 
-              // Se for a primeira vez, inicializa o estoque com padrão se estiver vazio
               if (Object.keys(estoque).length === 0) {
                 estoque = {
                   'bola-nike': 1,
@@ -156,23 +151,7 @@
               }
 
               atualizarInterface();
-            } else {
-              // Documento não existe, criar com dados padrão
-              moedas = 0;
-              estoque = {
-                'bola-nike': 1,
-                'jogos': 1,
-                'educacao': 1,
-                'horta': 1,
-                'jogos-virtuais': 1,
-                'balas': 300,
-                'pirulito': 100,
-                'cinema': 1
-              };
-              salvarDados();
             }
-          }, err => {
-            alert('Erro ao carregar dados: ' + err.message);
           });
 
         carregarProdutos();
@@ -181,7 +160,6 @@
       }
     });
 
-    // Salvar dados no Firestore
     function salvarDados() {
       db.collection('usuarios').doc(usuarioAtual.uid).set({
         moedas: moedas,
@@ -189,25 +167,22 @@
       });
     }
 
-    // Atualiza a interface com moedas, estoque, e habilita/desabilita botões
     function atualizarInterface() {
       document.getElementById('total-moedas').innerText = moedas;
 
       produtos.forEach(prod => {
         const btn = document.getElementById('btn-' + prod.id);
-        if (btn) {
-          btn.disabled = moedas < prod.preco;
-        }
-
-        // Atualiza texto do estoque
         const spanEstoque = document.getElementById('estoque-' + prod.id);
-        if (spanEstoque) {
-          spanEstoque.innerText = estoque[prod.id] !== undefined ? estoque[prod.id] : 0;
+
+        const disponivel = estoque[prod.id] !== undefined ? estoque[prod.id] : 0;
+        if (spanEstoque) spanEstoque.innerText = disponivel;
+
+        if (btn) {
+          btn.disabled = moedas < prod.preco || disponivel <= 0;
         }
       });
     }
 
-    // Carrega produtos no container
     function carregarProdutos() {
       const lista = document.getElementById('product-list');
       lista.innerHTML = '<h3>Produtos disponíveis</h3>';
@@ -219,14 +194,15 @@
           <img src="${prod.img}" alt="${prod.nome}" />
           <h4>${prod.nome}</h4>
           <p>Preço: ${prod.preco} Mrcoin</p>
-          <p>Estoque: <span id="estoque-${prod.id}">${estoque[prod.id] || 0}</span></p>
-          <button id="btn-${prod.id}" ${moedas < prod.preco ? 'disabled' : ''} onclick="comprarProduto('${prod.id}')">Comprar</button>
+          <p>Estoque: <span id="estoque-${prod.id}">0</span></p>
+          <button id="btn-${prod.id}" onclick="comprarProduto('${prod.id}')">Comprar</button>
         `;
         lista.appendChild(div);
       });
+
+      atualizarInterface();
     }
 
-    // Função para comprar um produto
     function comprarProduto(prodId) {
       const prod = produtos.find(p => p.id === prodId);
       if (!prod) {
@@ -234,26 +210,24 @@
         return;
       }
 
-      if (moedas < prod.preco) {
-        alert('Saldo insuficiente!');
+      const disponivel = estoque[prodId] || 0;
+      if (moedas < prod.preco || disponivel <= 0) {
+        alert('Saldo insuficiente ou produto esgotado!');
         return;
       }
 
       moedas -= prod.preco;
-      estoque[prodId] = (estoque[prodId] || 0) + 1;
+      estoque[prodId] = disponivel - 1;
 
       salvarDados();
-      atualizarInterface();
     }
 
-    // Função para ganhar moedas (teste)
     function ganharMoeda() {
       moedas++;
       salvarDados();
       atualizarInterface();
     }
 
-    // Logout
     function logout() {
       auth.signOut().then(() => {
         window.location.href = 'index.html';
