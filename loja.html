@@ -95,7 +95,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <script>
-    // Config Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBFiGU-blNt7XFO9cjYPoWaPP-c5EEItfc",
       authDomain: "mrstore-d429f.firebaseapp.com",
@@ -220,12 +219,12 @@
       estoque[prodId] = disponivel - 1;
 
       salvarDados();
+      alert(`Parabéns! Você comprou: ${prod.nome}`);
     }
 
     function ganharMoeda() {
       moedas++;
       salvarDados();
-      atualizarInterface();
     }
 
     function logout() {
