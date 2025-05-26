@@ -1,9 +1,8 @@
-<!-- loja.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Loja - MrStore</title>
   <style>
     body {
@@ -80,9 +79,74 @@
   </div>
 
   <div class="container">
-    <div class="product-list" id="product-list">
+    <div class="product-list">
       <h3>Produtos disponíveis</h3>
+      
+      <div class="product" id="produto-bola-nike">
+        <img src="https://static.netshoes.com.br/produtos/bola-de-futebol-campo-nike-merlin-cbf/14/HZM-2881-114/HZM-2881-114_zoom2.jpg" alt="Bola da Nike">
+        <h4>Bola da Nike</h4>
+        <p>Preço: 5000 Mrcoin</p>
+        <p id="estoque-bola-nike">Estoque: 1</p>
+        <button id="btn-bola-nike" onclick="comprarProduto(5000, 'bola-nike')">Comprar</button>
+      </div>
+
+      <div class="product" id="produto-jogos">
+        <img src="https://2.bp.blogspot.com/-c68QkhR3hRc/UFcYdZ8ezrI/AAAAAAAACAQ/8nrWUMt3_iI/s1600/P%C3%A1tio+-+flores+(5).JPG" alt="Aula com jogos e brincadeiras">
+        <h4>Aula com jogos e brincadeiras na área externa</h4>
+        <p>Preço: 1000 Mrcoin</p>
+        <p id="estoque-jogos">Estoque: 1</p>
+        <button id="btn-jogos" onclick="comprarProduto(1000, 'jogos')">Comprar</button>
+      </div>
+
+      <div class="product" id="produto-educacao">
+        <img src="https://jundiai.sp.gov.br/noticias/wp-content/uploads/sites/32/2018/11/emeb_marcos_gasparian-166.jpg" alt="Aula extra de Educação física">
+        <h4>Aula extra de Educação física</h4>
+        <p>Preço: 1000 Mrcoin</p>
+        <p id="estoque-educacao">Estoque: 1</p>
+        <button id="btn-educacao" onclick="comprarProduto(1000, 'educacao')">Comprar</button>
+      </div>
+
+      <div class="product" id="produto-horta">
+        <img src="https://2.bp.blogspot.com/-Lj4wkphotVI/U9Gf68lVWRI/AAAAAAAAAog/6DV5vfqTe4U/s1600/DSC08998.JPG" alt="Aula interativa na horta">
+        <h4>Aula interativa na horta</h4>
+        <p>Preço: 1000 Mrcoin</p>
+        <p id="estoque-horta">Estoque: 1</p>
+        <button id="btn-horta" onclick="comprarProduto(1000, 'horta')">Comprar</button>
+      </div>
+
+      <div class="product" id="produto-jogos-virtuais">
+        <img src="https://img.freepik.com/fotos-gratis/criancas-da-escola-usando-tablet-digital-em-sala-de-aula_107420-57955.jpg?size=626&ext=jpg" alt="Aula com jogos virtuais">
+        <h4>Aula com jogos virtuais</h4>
+        <p>Preço: 1000 Mrcoin</p>
+        <p id="estoque-jogos-virtuais">Estoque: 1</p>
+        <button id="btn-jogos-virtuais" onclick="comprarProduto(1000, 'jogos-virtuais')">Comprar</button>
+      </div>
+
+      <div class="product" id="produto-balas">
+        <img src="https://a-static.mlcdn.com.br/800x560/pacote-bala-7-belo-framboesa-600g-arcor/produtosdemaquiagem/10761p/370cbc11ef578c1c36f9c6bc2996a45b.jpg" alt="Balas">
+        <h4>Balas</h4>
+        <p>Preço: 10 Mrcoin</p>
+        <p id="estoque-balas">Estoque: 300</p>
+        <button id="btn-balas" onclick="comprarProduto(10, 'balas')">Comprar</button>
+      </div>
+
+      <div class="product" id="produto-pirulito">
+        <img src="https://cdn.awsli.com.br/2500x2500/1957/1957771/produto/1047748409ee2f58d9d.jpg" alt="Pirulito">
+        <h4>Pirulito</h4>
+        <p>Preço: 20 Mrcoin</p>
+        <p id="estoque-pirulito">Estoque: 100</p>
+        <button id="btn-pirulito" onclick="comprarProduto(20, 'pirulito')">Comprar</button>
+      </div>
+
+      <div class="product" id="produto-cinema">
+        <img src="https://2.bp.blogspot.com/-goes4lu3wsQ/VTl7mzY2lpI/AAAAAAAAGR0/By2X6yTVvZk/s1600/crian%C3%A7as-filmes.jpg" alt="Aula de cinema com pipoca">
+        <h4>Aula de cinema com pipoca na sala</h4>
+        <p>Preço: 1000 Mrcoin</p>
+        <p id="estoque-cinema">Estoque: 1</p>
+        <button id="btn-cinema" onclick="comprarProduto(1000, 'cinema')">Comprar</button>
+      </div>
     </div>
+
     <div class="total">
       <h3>Total de Mrcoin: <span id="total-moedas">0</span></h3>
       <button onclick="ganharMoeda()">Ganhar 1 Mrcoin</button>
@@ -95,6 +159,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <script>
+    // Config Firebase (mesma do seu index.html)
     const firebaseConfig = {
       apiKey: "AIzaSyBFiGU-blNt7XFO9cjYPoWaPP-c5EEItfc",
       authDomain: "mrstore-d429f.firebaseapp.com",
@@ -104,122 +169,108 @@
       appId: "1:310913725702:web:22775b2fa034b0697e1a87"
     };
 
+    // Inicializa Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    let userEmail = localStorage.getItem('usuario_logado');
-    if (!userEmail) {
-      window.location.href = 'index.html';
-    } else {
-      document.getElementById('nome-usuario').innerText = userEmail;
-    }
-
+    let usuarioAtual = null;
     let moedas = 0;
+    let estoque = {};
 
-    const produtos = [
-      {
-        id: 'bola-nike', nome: 'Bola da Nike', preco: 5000, img: 'https://static.netshoes.com.br/produtos/bola-de-futebol-campo-nike-merlin-cbf/14/HZM-2881-114/HZM-2881-114_zoom2.jpg'
-      },
-      {
-        id: 'jogos', nome: 'Aula com jogos e brincadeiras', preco: 1000, img: 'https://2.bp.blogspot.com/-c68QkhR3hRc/UFcYdZ8ezrI/AAAAAAAACAQ/8nrWUMt3_iI/s1600/P%C3%A1tio+-+flores+(5).JPG'
-      },
-      {
-        id: 'educacao', nome: 'Aula extra de Educação física', preco: 1000, img: 'https://jundiai.sp.gov.br/noticias/wp-content/uploads/sites/32/2018/11/emeb_marcos_gasparian-166.jpg'
-      },
-      {
-        id: 'horta', nome: 'Aula interativa na horta', preco: 1000, img: 'https://2.bp.blogspot.com/-Lj4wkphotVI/U9Gf68lVWRI/AAAAAAAAAog/6DV5vfqTe4U/s1600/DSC08998.JPG'
-      },
-      {
-        id: 'jogos-virtuais', nome: 'Aula com jogos virtuais', preco: 1000, img: 'https://img.freepik.com/fotos-gratis/criancas-da-escola-usando-tablet-digital-em-sala-de-aula_107420-57955.jpg?size=626&ext=jpg'
-      },
-      {
-        id: 'balas', nome: 'Balas', preco: 10, img: 'https://a-static.mlcdn.com.br/800x560/pacote-bala-7-belo-framboesa-600g-arcor/produtosdemaquiagem/10761p/370cbc11ef578c1c36f9c6bc2996a45b.jpg'
-      },
-      {
-        id: 'pirulito', nome: 'Pirulito', preco: 20, img: 'https://cdn.awsli.com.br/2500x2500/1957/1957771/produto/1047748409ee2f58d9d.jpg'
-      },
-      {
-        id: 'cinema', nome: 'Cinema com pipoca na sala', preco: 1000, img: 'https://2.bp.blogspot.com/-goes4lu3wsQ/VTl7mzY2lpI/AAAAAAAAGR0/By2X6yTVvZk/s1600/crian%C3%A7as-filmes.jpg'
+    // Verifica autenticação
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        usuarioAtual = user;
+        document.getElementById('nome-usuario').innerText = user.email;
+        carregarDados();
+      } else {
+        window.location.href = 'index.html'; // Não logado, volta para login
       }
-    ];
+    });
 
-    async function carregarProdutos() {
-      const container = document.getElementById('product-list');
-      const estoqueRef = db.collection('estoque').doc('global');
-      const moedasRef = db.collection('usuarios').doc(userEmail);
-
-      const [estoqueSnap, moedasSnap] = await Promise.all([
-        estoqueRef.get(),
-        moedasRef.get()
-      ]);
-
-      const estoque = estoqueSnap.exists ? estoqueSnap.data() : {};
-      moedas = moedasSnap.exists ? moedasSnap.data().mrcoin || 0 : 0;
-
-      atualizarTela();
-      container.innerHTML = '';
-      produtos.forEach(prod => {
-        const est = estoque[prod.id] ?? 0;
-        const desativado = est <= 0 ? 'disabled' : '';
-        container.innerHTML += `
-          <div class="product">
-            <img src="${prod.img}" alt="${prod.nome}" />
-            <h4>${prod.nome}</h4>
-            <p>Preço: ${prod.preco} Mrcoin</p>
-            <p id="estoque-${prod.id}">Estoque: ${est}</p>
-            <button id="btn-${prod.id}" onclick="comprarProduto('${prod.id}', ${prod.preco})" ${desativado}>Comprar</button>
-          </div>
-        `;
+    // Carrega dados do Firestore
+    function carregarDados() {
+      const docRef = db.collection('usuarios').doc(usuarioAtual.uid);
+      docRef.get().then(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          moedas = data.moedas || 0;
+          estoque = data.estoque || {
+            'bola-nike': 1,
+            'jogos': 1,
+            'educacao': 1,
+            'horta': 1,
+            'jogos-virtuais': 1,
+            'balas': 300,
+            'pirulito': 100,
+            'cinema': 1
+          };
+        } else {
+          moedas = 0;
+          estoque = {
+            'bola-nike': 1,
+            'jogos': 1,
+            'educacao': 1,
+            'horta': 1,
+            'jogos-virtuais': 1,
+            'balas': 300,
+            'pirulito': 100,
+            'cinema': 1
+          };
+          salvarDados();
+        }
+        atualizarInterface();
+      }).catch(error => {
+        alert('Erro ao carregar dados: ' + error);
       });
     }
 
-    async function comprarProduto(id, preco) {
-      const estoqueRef = db.collection('estoque').doc('global');
-      const moedasRef = db.collection('usuarios').doc(userEmail);
-
-      const [estoqueSnap, moedasSnap] = await Promise.all([
-        estoqueRef.get(),
-        moedasRef.get()
-      ]);
-
-      const estoque = estoqueSnap.data();
-      const saldo = moedasSnap.data().mrcoin || 0;
-
-      if (estoque[id] <= 0) {
-        alert('Produto fora de estoque!');
-        return;
-      }
-
-      if (saldo < preco) {
-        alert('Você não tem Mrcoin suficiente!');
-        return;
-      }
-
-      estoque[id]--;
-      await estoqueRef.set(estoque);
-      await moedasRef.set({ mrcoin: saldo - preco });
-
-      alert('Compra realizada com sucesso!');
-      carregarProdutos();
+    // Salva dados no Firestore
+    function salvarDados() {
+      db.collection('usuarios').doc(usuarioAtual.uid).set({
+        moedas: moedas,
+        estoque: estoque
+      });
     }
 
-    async function ganharMoeda() {
-      moedas++;
-      await db.collection('usuarios').doc(userEmail).set({ mrcoin: moedas });
-      atualizarTela();
-    }
-
-    function atualizarTela() {
+    // Atualiza interface com dados atuais
+    function atualizarInterface() {
       document.getElementById('total-moedas').innerText = moedas;
+      for (let produto in estoque) {
+        const estoqueEl = document.getElementById('estoque-' + produto);
+        const btnEl = document.getElementById('btn-' + produto);
+        if (estoqueEl) estoqueEl.innerText = 'Estoque: ' + estoque[produto];
+        if (btnEl) btnEl.disabled = estoque[produto] <= 0;
+      }
     }
 
+    // Ganhar 1 moeda
+    function ganharMoeda() {
+      moedas++;
+      salvarDados();
+      atualizarInterface();
+    }
+
+    // Comprar produto
+    function comprarProduto(preco, produto) {
+      if (moedas >= preco && estoque[produto] > 0) {
+        moedas -= preco;
+        estoque[produto]--;
+        salvarDados();
+        atualizarInterface();
+        alert("Você comprou o " + produto + " com sucesso!");
+      } else {
+        alert("Você não tem moedas suficientes ou o estoque acabou.");
+      }
+    }
+
+    // Logout Firebase
     function logout() {
-      localStorage.removeItem('usuario_logado');
-      window.location.href = 'index.html';
+      auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
     }
-
-    window.onload = carregarProdutos;
   </script>
 </body>
 </html>
