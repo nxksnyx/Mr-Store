@@ -1,4 +1,3 @@
-// Inicializa Firebase (mesma config do index.html)
 const firebaseConfig = {
   apiKey: "AIzaSyBFiGU-blNt7XFO9cjYPoWaPP-c5EEItfc",
   authDomain: "mrstore-d429f.firebaseapp.com",
@@ -7,21 +6,14 @@ const firebaseConfig = {
   messagingSenderId: "310913725702",
   appId: "1:310913725702:web:22775b2fa034b0697e1a87"
 };
+
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
 
+let usuarioAtual = null;
 let moedas = 0;
-let estoque = {
-  bolaNike: 1,
-  jogos: 1,
-  educacao: 1,
-  horta: 1,
-  jogosVirtuais: 1,
-  balas: 300,
-  pirulito: 100,
-  cinema: 1
-};
-
+let estoque = {};
 let produtos = [
   { nome: 'bolaNike', preco: 5000 },
   { nome: 'jogos', preco: 1000 },
@@ -33,69 +25,98 @@ let produtos = [
   { nome: 'cinema', preco: 1000 }
 ];
 
-// Verifica se o usuário está logado ao carregar a página
 auth.onAuthStateChanged(user => {
   if (user) {
+    usuarioAtual = user;
     document.getElementById('nome-usuario').innerText = user.email || 'Usuário';
-    carregarProdutos();
-    atualizarTela();
+
+    // Carrega dados do Firestore
+    db.collection('usuarios').doc(user.uid).onSnapshot(doc => {
+      if (doc.exists) {
+        const data = doc.data();
+        moedas = data.moedas || 0;
+        estoque = data.estoque || {};
+
+        if (Object.keys(estoque).length === 0) {
+          estoque = {
+            bolaNike: 1,
+            jogos: 1,
+            educacao: 1,
+            horta: 1,
+            jogosVirtuais: 1,
+            balas: 300,
+            pirulito: 100,
+            cinema: 1
+          };
+          salvarDados();
+        }
+
+        carregarProdutos();
+        atualizarTela();
+      }
+    });
+
   } else {
-    // Se não estiver logado, redireciona para login
     window.location.href = 'index.html';
   }
 });
 
-// Função para logout
-function logout() {
-  auth.signOut().then(() => {
-    localStorage.removeItem('usuario_logado');
-    window.location.href = 'index.html';
+function salvarDados() {
+  db.collection('usuarios').doc(usuarioAtual.uid).set({
+    moedas: moedas,
+    estoque: estoque
   });
 }
 
-// Função para ganhar moedas
 function ganharMoeda() {
   moedas++;
-  atualizarTela();
+  salvarDados();
 }
 
-// Função para atualizar a tela de saldo e atualizar botões
 function atualizarTela() {
   document.getElementById('total-moedas').innerText = moedas;
 
-  // Atualiza os botões de compra: ativa/desativa conforme moedas e estoque
   produtos.forEach(prod => {
     const btn = document.getElementById('btn-' + prod.nome);
     if (btn) {
-      btn.disabled = moedas < prod.preco || estoque[prod.nome] <= 0;
+      const disponivel = estoque[prod.nome] || 0;
+      btn.disabled = moedas < prod.preco || disponivel <= 0;
     }
   });
 }
 
-// Função para comprar um produto
 function comprarProduto(preco, produto) {
-  if (moedas >= preco && estoque[produto] > 0) {
+  const disponivel = estoque[produto] || 0;
+  if (moedas >= preco && disponivel > 0) {
     moedas -= preco;
-    estoque[produto]--;
-    atualizarTela();
+    estoque[produto] = disponivel - 1;
+    salvarDados();
     alert('Você comprou ' + produto);
   } else {
     alert('Não há moedas suficientes ou estoque insuficiente');
   }
 }
 
-// Função para carregar produtos na tela
 function carregarProdutos() {
   const container = document.getElementById('product-list');
+  container.innerHTML = '<h3>Produtos disponíveis</h3>';
   produtos.forEach(prod => {
+    const disponivel = estoque[prod.nome] || 0;
+
     const div = document.createElement('div');
     div.classList.add('product');
     div.innerHTML = `
       <h4>${prod.nome}</h4>
       <p>Preço: ${prod.preco} Mrcoin</p>
-      <p>Estoque: ${estoque[prod.nome]}</p>
+      <p>Estoque: ${disponivel}</p>
       <button id="btn-${prod.nome}" onclick="comprarProduto(${prod.preco}, '${prod.nome}')">Comprar</button>
     `;
     container.appendChild(div);
+  });
+}
+
+function logout() {
+  auth.signOut().then(() => {
+    window.location.href = 'index.html';
   });
 }
