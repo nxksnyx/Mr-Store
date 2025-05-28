@@ -232,24 +232,50 @@
       userEditEl.style.display = 'flex';
     }
 
-    btnSalvar.onclick = () => {
-      if (!selectedUser) return alert("Selecione um usuário antes de salvar.");
-      const moedas = parseInt(editMoedasInput.value) || 0;
-      const novoEstoque = {};
-      editEstoqueDiv.querySelectorAll('input').forEach(input => novoEstoque[input.dataset.prodId] = parseInt(input.value) || 0);
-      const novosPrecos = {};
-      editPrecosDiv.querySelectorAll('input').forEach(input => novosPrecos[input.dataset.prodId] = parseInt(input.value) || 0);
+btnSalvar.onclick = () => {
+  if (!selectedUser) return alert("Selecione um usuário antes de salvar.");
+  const mrcoin = parseInt(editMoedasInput.value) || 0;
 
-      if (applyAllCheckbox.checked) {
-        const batch = db.batch();
-        usuarios.forEach(user => batch.update(db.collection('users').doc(user.id), { moedas, estoque: novoEstoque, precos: novosPrecos }));
-        batch.commit().then(() => alert('Todos os usuários foram atualizados!')).catch(console.error);
-      } else {
-        db.collection('users').doc(selectedUser.id).update({ moedas, estoque: novoEstoque, precos: novosPrecos })
-          .then(() => alert('Usuário atualizado com sucesso!'))
-          .catch(console.error);
-      }
-    };
+  const novoEstoque = {};
+  editEstoqueDiv.querySelectorAll('input').forEach(input => {
+    novoEstoque[input.dataset.prodId] = parseInt(input.value) || 0;
+  });
+
+  const novosPrecos = {};
+  editPrecosDiv.querySelectorAll('input').forEach(input => {
+    novosPrecos[input.dataset.prodId] = parseInt(input.value) || 0;
+  });
+
+  if (applyAllCheckbox.checked) {
+    const batch = db.batch();
+    usuarios.forEach(user => {
+      const ref = db.collection('users').doc(user.id);
+      batch.update(ref, {
+        mrcoin,
+        estoque: novoEstoque,
+        precos: novosPrecos
+      });
+    });
+    batch.commit()
+      .then(() => alert('Todos os usuários foram atualizados!'))
+      .catch(error => {
+        console.error("Erro ao aplicar para todos:", error);
+        alert("Erro ao salvar os dados.");
+      });
+  } else {
+    db.collection('users').doc(selectedUser.id).update({
+      mrcoin,
+      estoque: novoEstoque,
+      precos: novosPrecos
+    }).then(() => {
+      alert('Usuário atualizado com sucesso!');
+    }).catch(error => {
+      console.error("Erro ao salvar:", error);
+      alert("Erro ao salvar os dados.");
+    });
+  }
+};
+
 
     const adminMensagemEl = document.getElementById('admin-mensagem');
     const mensagemAtualEl = document.getElementById('mensagem-atual');
