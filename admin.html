@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Painel Admin - MrStore</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 20px;
+      background: #f9f9f9;
+      color: #222;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    #user-list {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      width: 250px;
+    }
+    .user-item {
+      cursor: pointer;
+      padding: 5px;
+      border-bottom: 1px solid #eee;
+    }
+    .user-item.active {
+      background-color: #cce5ff;
+      font-weight: bold;
+    }
+    #user-edit {
+      margin-left: 30px;
+      flex-grow: 1;
+      display: none;
+      flex-direction: column;
+      max-width: 500px;
+    }
+    #container {
+      display: flex;
+      gap: 20px;
+    }
+    label {
+      display: flex;
+      justify-content: space-between;
+      margin: 5px 0;
+    }
+    input[type="number"] {
+      width: 80px;
+      padding: 3px;
+    }
+    #edit-precos label, #edit-estoque label {
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 3px;
+    }
+    #btn-salvar {
+      margin-top: 15px;
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    #btn-salvar:hover {
+      background: #0056b3;
+    }
+    #admin-mensagem {
+      width: 100%;
+      height: 60px;
+      margin-top: 10px;
+    }
+    #mensagem-atual {
+      margin-top: 10px;
+      font-style: italic;
+      color: #555;
+    }
+    .section-title {
+      margin-top: 10px;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+    #logout-btn {
+      margin-top: 15px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    #logout-btn:hover {
+      background: #b02a37;
+    }
+  </style>
+</head>
+<body>
+  <h1>Painel Admin - MrStore</h1>
+  <button id="logout-btn">Logout</button>
+  <div id="container">
+    <div id="user-list">
+      <p>Carregando usuários...</p>
+    </div>
+    <div id="user-edit">
+      <div><strong>Usuário: </strong><span id="edit-email">(nenhum selecionado)</span></div>
+      <label>Mrcoin:
+        <input type="number" id="edit-moedas" min="0" value="0" />
+      </label>
+      <div class="section-title">Estoque</div>
+      <div id="edit-estoque"></div>
+      <div class="section-title">Preços</div>
+      <div id="edit-precos"></div>
+      <label>
+        <input type="checkbox" id="apply-all" /> Aplicar para todos os usuários
+      </label>
+      <button id="btn-salvar">Salvar Alterações</button>
+    </div>
+  </div>
+  <div style="margin-top:40px;">
+    <h2>Mensagem Global</h2>
+    <textarea id="admin-mensagem" placeholder="Digite a mensagem para todos os usuários"></textarea><br/>
+    <button onclick="salvarMensagem()">Enviar Mensagem</button>
+    <div id="mensagem-atual">Nenhuma mensagem ativa.</div>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBFiGU-blNt7XFO9cjYPoWaPP-c5EEItfc",
+      authDomain: "mrstore-d429f.firebaseapp.com",
+      projectId: "mrstore-d429f",
+      storageBucket: "mrstore-d429f.appspot.com",
+      messagingSenderId: "310913725702",
+      appId: "1:310913725702:web:22775b2fa034b0697e1a87"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const userListEl = document.getElementById('user-list');
+    const userEditEl = document.getElementById('user-edit');
+    const editEmailEl = document.getElementById('edit-email');
+    const editMoedasInput = document.getElementById('edit-moedas');
+    const editEstoqueDiv = document.getElementById('edit-estoque');
+    const editPrecosDiv = document.getElementById('edit-precos');
+    const applyAllCheckbox = document.getElementById('apply-all');
+    const btnSalvar = document.getElementById('btn-salvar');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    let usuarios = [];
+    let produtos = [];
+    let selectedUser = null;
+
+    function carregarProdutos() {
+      produtos = [
+        { id: 'bola_nike', nome: 'Bola da Nike' },
+        { id: 'aula_jogos_externos', nome: 'Aula com jogos e brincadeiras' },
+        { id: 'aula_extra_ef', nome: 'Aula extra de Educação física' },
+        { id: 'horta', nome: 'Aula interativa na horta' },
+        { id: 'jogos_virtuais', nome: 'Aula com jogos virtuais' },
+        { id: 'balas', nome: 'Balas' },
+        { id: 'pirulito', nome: 'Pirulito' },
+        { id: 'cinema', nome: 'Aula de cinema com pipoca' }
+      ];
+    }
+
+    function checkAdmin(user) {
+      if (!user || user.email !== "sandrachefa@gmail.com") {
+        alert("Você não tem permissão para acessar essa página.");
+        window.location.href = "index.html";
+      } else {
+        carregarProdutos();
+        carregarUsuarios();
+        carregarMensagem();
+      }
+    }
+
+    logoutBtn.onclick = () => auth.signOut().then(() => window.location.href = "index.html");
+
+    function carregarUsuarios() {
+      userListEl.innerHTML = '<p>Carregando usuários...</p>';
+      db.collection('users').get().then(querySnapshot => {
+        usuarios = [];
+        userListEl.innerHTML = '';
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          usuarios.push({id: doc.id, ...data});
+          const div = document.createElement('div');
+          div.classList.add('user-item');
+          div.textContent = data.email || '(sem email)';
+          div.dataset.id = doc.id;
+          div.addEventListener('click', () => selecionarUsuario(doc.id));
+          userListEl.appendChild(div);
+        });
+        if (usuarios.length === 0) userListEl.innerHTML = '<p>Nenhum usuário encontrado.</p>';
+      }).catch(console.error);
+    }
+
+    function selecionarUsuario(id) {
+      selectedUser = usuarios.find(u => u.id === id);
+      if (!selectedUser) return;
+      [...userListEl.children].forEach(el => el.classList.remove('active'));
+      const elAtivo = [...userListEl.children].find(el => el.dataset.id === id);
+      if(elAtivo) elAtivo.classList.add('active');
+      editEmailEl.textContent = selectedUser.email || selectedUser.id || '(sem email)';
+      editMoedasInput.value = selectedUser.moedas || 0;
+      editEstoqueDiv.innerHTML = '';
+      editPrecosDiv.innerHTML = '';
+      produtos.forEach(prod => {
+        const labelEstoque = document.createElement('label');
+        labelEstoque.textContent = prod.nome;
+        const inputEstoque = document.createElement('input');
+        inputEstoque.type = 'number';
+        inputEstoque.min = 0;
+        inputEstoque.value = (selectedUser.estoque?.[prod.id]) || 0;
+        inputEstoque.dataset.prodId = prod.id;
+        labelEstoque.appendChild(inputEstoque);
+        editEstoqueDiv.appendChild(labelEstoque);
+
+        const labelPreco = document.createElement('label');
+        labelPreco.textContent = prod.nome;
+        const inputPreco = document.createElement('input');
+        inputPreco.type = 'number';
+        inputPreco.min = 0;
+        inputPreco.value = (selectedUser.precos?.[prod.id]) || 0;
+        inputPreco.dataset.prodId = prod.id;
+        labelPreco.appendChild(inputPreco);
+        editPrecosDiv.appendChild(labelPreco);
+      });
+      userEditEl.style.display = 'flex';
+    }
+
+    btnSalvar.onclick = () => {
+      if (!selectedUser) return alert("Selecione um usuário antes de salvar.");
+      const moedas = parseInt(editMoedasInput.value) || 0;
+      const novoEstoque = {};
+      editEstoqueDiv.querySelectorAll('input').forEach(input => novoEstoque[input.dataset.prodId] = parseInt(input.value) || 0);
+      const novosPrecos = {};
+      editPrecosDiv.querySelectorAll('input').forEach(input => novosPrecos[input.dataset.prodId] = parseInt(input.value) || 0);
+
+      if (applyAllCheckbox.checked) {
+        const batch = db.batch();
+        usuarios.forEach(user => batch.update(db.collection('users').doc(user.id), { moedas, estoque: novoEstoque, precos: novosPrecos }));
+        batch.commit().then(() => alert('Todos os usuários foram atualizados!')).catch(console.error);
+      } else {
+        db.collection('users').doc(selectedUser.id).update({ moedas, estoque: novoEstoque, precos: novosPrecos })
+          .then(() => alert('Usuário atualizado com sucesso!'))
+          .catch(console.error);
+      }
+    };
+
+    const adminMensagemEl = document.getElementById('admin-mensagem');
+    const mensagemAtualEl = document.getElementById('mensagem-atual');
+
+    function carregarMensagem() {
+      db.collection('admin').doc('mensagemGlobal').get()
+        .then(doc => {
+          const texto = doc.data()?.texto || '';
+          adminMensagemEl.value = texto;
+          mensagemAtualEl.textContent = texto ? "Mensagem atual: " + texto : "Nenhuma mensagem ativa.";
+        }).catch(console.error);
+    }
+
+    function salvarMensagem() {
+      const texto = adminMensagemEl.value.trim();
+      db.collection('admin').doc('mensagemGlobal').set({ texto })
+        .then(() => {
+          mensagemAtualEl.textContent = texto ? "Mensagem atual: " + texto : "Nenhuma mensagem ativa.";
+          alert('Mensagem global salva.');
+        }).catch(console.error);
+    }
+
+    auth.onAuthStateChanged(user => user ? checkAdmin(user) : window.location.href = "index.html");
+  </script>
+</body>
+</html>

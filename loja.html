@@ -70,12 +70,26 @@
       background-color: #ccc;
       cursor: not-allowed;
     }
+
+    #btn-admin {
+      background-color: #32CD32;
+      color: white;
+      font-weight: bold;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-left: 10px;
+      border: none;
+    }
   </style>
 </head>
 <body>
   <div class="top-bar">
     <h2>Bem-vindo, <span id="nome-usuario"></span>!</h2>
-    <button onclick="logout()">Sair</button>
+    <div>
+      <button onclick="logout()">Sair</button>
+      <button id="btn-admin" style="display:none;" onclick="irParaAdmin()">Admin</button>
+    </div>
   </div>
 
   <div class="container">
@@ -184,10 +198,24 @@
         usuarioAtual = user;
         document.getElementById('nome-usuario').innerText = user.email;
         carregarDados();
+        verificarAdmin();
       } else {
         window.location.href = 'index.html'; // Não logado, volta para login
       }
     });
+
+    // Mostra botão Admin só para o email admin
+    function verificarAdmin() {
+      const emailAdmin = 'sandrachefa@gmail.com';
+      if (usuarioAtual && usuarioAtual.email === emailAdmin) {
+        document.getElementById('btn-admin').style.display = 'inline-block';
+      }
+    }
+
+    // Redireciona para a página admin
+    function irParaAdmin() {
+      window.location.href = 'admin.html';
+    }
 
     // Carrega dados do Firestore
     function carregarDados() {

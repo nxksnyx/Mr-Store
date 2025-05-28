@@ -92,6 +92,7 @@
     // Inicializa Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.firestore();
 
     function toggleForm() {
       const title = document.getElementById('form-title');
@@ -109,13 +110,30 @@
       }
     }
 
+    function salvarUsuarioNoFirestore(user) {
+      const userDocRef = db.collection('users').doc(user.uid);
+      return userDocRef.set({
+        email: user.email,
+        mrcoin: 0,
+        estoque: {}
+      }, { merge: true });
+    }
+
     function processarAuth() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       const isLogin = document.getElementById('form-title').innerText === 'Login';
 
+      if (!email || !password) {
+        alert("Por favor, preencha email e senha.");
+        return;
+      }
+
       if (isLogin) {
         auth.signInWithEmailAndPassword(email, password)
+          .then(({ user }) => {
+            return salvarUsuarioNoFirestore(user); // garante criar/atualizar doc no Firestore
+          })
           .then(() => {
             localStorage.setItem('usuario_logado', email);
             window.location.href = 'loja.html';
@@ -123,6 +141,9 @@
           .catch(err => alert('Erro: ' + err.message));
       } else {
         auth.createUserWithEmailAndPassword(email, password)
+          .then(({ user }) => {
+            return salvarUsuarioNoFirestore(user); // salva ao criar conta
+          })
           .then(() => {
             localStorage.setItem('usuario_logado', email);
             window.location.href = 'loja.html';
