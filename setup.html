@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Setup Firebase Loja</title>
+</head>
+<body style="font-family: sans-serif; padding: 30px;">
+  <h2>Inicializar Firestore da MrStore</h2>
+  <button onclick="iniciarSetup()">Rodar Setup</button>
+  <p id="status"></p>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBFiGU-blNt7XFO9cjYPoWaPP-c5EEItfc",
+      authDomain: "mrstore-d429f.firebaseapp.com",
+      projectId: "mrstore-d429f",
+      storageBucket: "mrstore-d429f.appspot.com",
+      messagingSenderId: "310913725702",
+      appId: "1:310913725702:web:22775b2fa034b0697e1a87"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    async function iniciarSetup() {
+      document.getElementById('status').innerText = "Configurando Firestore...";
+
+      const aulas = ['aula_jogos', 'aula_ping', 'aula_fisica', 'aula_cinema', 'aula_horta'];
+      const outrosProdutos = ['bola_nike', 'balas', 'pirulito', 'jogos_virtuais'];
+
+      const precos = {};
+      const estoque = {};
+
+      // Preços e estoques padrão
+      aulas.forEach(p => { precos[p] = 100; }); // exemplo
+      outrosProdutos.forEach(p => {
+        precos[p] = 20;
+        estoque[p] = 10;
+      });
+
+      // Salvar loja/config
+      await db.collection('loja').doc('config').set({
+        preco: precos,
+        estoque: estoque
+      }, { merge: true });
+
+      // Criar salas com investimentos zerados
+      const salas = [
+        '6 A', '6 B', '6 C',
+        '7 A', '7 C',
+        '8 A', '8 B', '8 C', '8 D',
+        '9 A', '9 B', '9 C'
+      ];
+
+      const investimentosZerados = {};
+      aulas.forEach(aula => {
+        investimentosZerados[aula] = 0;
+      });
+
+      for (const sala of salas) {
+        await db.collection('salas').doc(sala).set({
+          investimentos: investimentosZerados,
+          alunos: []
+        }, { merge: true });
+      }
+
+      document.getElementById('status').innerText = "✅ Setup finalizado com sucesso!";
+    }
+  </script>
+</body>
+</html>

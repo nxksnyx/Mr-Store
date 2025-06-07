@@ -71,7 +71,7 @@
       cursor: not-allowed;
     }
 
-    #btn-admin {
+    #btn-gerenciar-notas {
       background-color: #32CD32;
       color: white;
       font-weight: bold;
@@ -80,6 +80,22 @@
       cursor: pointer;
       margin-left: 10px;
       border: none;
+      display: none;
+    }
+
+    .notas-container {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 10px;
+    }
+
+    .notas-container h4 {
+      margin: 0 0 10px 0;
+    }
+
+    .notas-container p {
+      margin: 5px 0;
     }
   </style>
 </head>
@@ -88,82 +104,32 @@
     <h2>Bem-vindo, <span id="nome-usuario"></span>!</h2>
     <div>
       <button onclick="logout()">Sair</button>
-      <button id="btn-admin" style="display:none;" onclick="irParaAdmin()">Admin</button>
+      <button id="btn-gerenciar-notas" onclick="irParaGerenciarNotas()">Gerenciar Notas</button>
     </div>
   </div>
 
   <div class="container">
     <div class="product-list">
       <h3>Produtos disponíveis</h3>
-      
-      <div class="product" id="produto-bola-nike">
-        <img src="https://static.netshoes.com.br/produtos/bola-de-futebol-campo-nike-merlin-cbf/14/HZM-2881-114/HZM-2881-114_zoom2.jpg" alt="Bola da Nike">
-        <h4>Bola da Nike</h4>
-        <p>Preço: 5000 Mrcoin</p>
-        <p id="estoque-bola-nike">Estoque: 1</p>
-        <button id="btn-bola-nike" onclick="comprarProduto(5000, 'bola-nike')">Comprar</button>
-      </div>
-
-      <div class="product" id="produto-jogos">
-        <img src="https://2.bp.blogspot.com/-c68QkhR3hRc/UFcYdZ8ezrI/AAAAAAAACAQ/8nrWUMt3_iI/s1600/P%C3%A1tio+-+flores+(5).JPG" alt="Aula com jogos e brincadeiras">
-        <h4>Aula com jogos e brincadeiras na área externa</h4>
-        <p>Preço: 1000 Mrcoin</p>
-        <p id="estoque-jogos">Estoque: 1</p>
-        <button id="btn-jogos" onclick="comprarProduto(1000, 'jogos')">Comprar</button>
-      </div>
-
-      <div class="product" id="produto-educacao">
-        <img src="https://jundiai.sp.gov.br/noticias/wp-content/uploads/sites/32/2018/11/emeb_marcos_gasparian-166.jpg" alt="Aula extra de Educação física">
-        <h4>Aula extra de Educação física</h4>
-        <p>Preço: 1000 Mrcoin</p>
-        <p id="estoque-educacao">Estoque: 1</p>
-        <button id="btn-educacao" onclick="comprarProduto(1000, 'educacao')">Comprar</button>
-      </div>
-
-      <div class="product" id="produto-horta">
-        <img src="https://2.bp.blogspot.com/-Lj4wkphotVI/U9Gf68lVWRI/AAAAAAAAAog/6DV5vfqTe4U/s1600/DSC08998.JPG" alt="Aula interativa na horta">
-        <h4>Aula interativa na horta</h4>
-        <p>Preço: 1000 Mrcoin</p>
-        <p id="estoque-horta">Estoque: 1</p>
-        <button id="btn-horta" onclick="comprarProduto(1000, 'horta')">Comprar</button>
-      </div>
-
-      <div class="product" id="produto-jogos-virtuais">
-        <img src="https://img.freepik.com/fotos-gratis/criancas-da-escola-usando-tablet-digital-em-sala-de-aula_107420-57955.jpg?size=626&ext=jpg" alt="Aula com jogos virtuais">
-        <h4>Aula com jogos virtuais</h4>
-        <p>Preço: 1000 Mrcoin</p>
-        <p id="estoque-jogos-virtuais">Estoque: 1</p>
-        <button id="btn-jogos-virtuais" onclick="comprarProduto(1000, 'jogos-virtuais')">Comprar</button>
-      </div>
-
-      <div class="product" id="produto-balas">
-        <img src="https://a-static.mlcdn.com.br/800x560/pacote-bala-7-belo-framboesa-600g-arcor/produtosdemaquiagem/10761p/370cbc11ef578c1c36f9c6bc2996a45b.jpg" alt="Balas">
-        <h4>Balas</h4>
-        <p>Preço: 10 Mrcoin</p>
-        <p id="estoque-balas">Estoque: 300</p>
-        <button id="btn-balas" onclick="comprarProduto(10, 'balas')">Comprar</button>
-      </div>
-
-      <div class="product" id="produto-pirulito">
-        <img src="https://cdn.awsli.com.br/2500x2500/1957/1957771/produto/1047748409ee2f58d9d.jpg" alt="Pirulito">
-        <h4>Pirulito</h4>
-        <p>Preço: 20 Mrcoin</p>
-        <p id="estoque-pirulito">Estoque: 100</p>
-        <button id="btn-pirulito" onclick="comprarProduto(20, 'pirulito')">Comprar</button>
-      </div>
-
-      <div class="product" id="produto-cinema">
-        <img src="https://2.bp.blogspot.com/-goes4lu3wsQ/VTl7mzY2lpI/AAAAAAAAGR0/By2X6yTVvZk/s1600/crian%C3%A7as-filmes.jpg" alt="Aula de cinema com pipoca">
-        <h4>Aula de cinema com pipoca na sala</h4>
-        <p>Preço: 1000 Mrcoin</p>
-        <p id="estoque-cinema">Estoque: 1</p>
-        <button id="btn-cinema" onclick="comprarProduto(1000, 'cinema')">Comprar</button>
-      </div>
+      <div id="product-list"></div>
     </div>
 
     <div class="total">
       <h3>Total de Mrcoin: <span id="total-moedas">0</span></h3>
-      <button onclick="ganharMoeda()">Ganhar 1 Mrcoin</button>
+
+      <div class="notas-container">
+        <h4>Suas Notas</h4>
+        <p>Projeto 1: <span id="nota-projeto1">-</span></p>
+        <p>Projeto 2: <span id="nota-projeto2">-</span></p>
+        <p>Avaliação de Tecnologia: <span id="nota-tecnologia">-</span></p>
+        <p>Prova Paulista: <span id="nota-paulista">-</span></p>
+
+        <h4>Média da Sala</h4>
+        <p>Projeto 1: <span id="media-projeto1">-</span></p>
+        <p>Projeto 2: <span id="media-projeto2">-</span></p>
+        <p>Avaliação de Tecnologia: <span id="media-tecnologia">-</span></p>
+        <p>Prova Paulista: <span id="media-paulista">-</span></p>
+      </div>
     </div>
   </div>
 
@@ -172,133 +138,16 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
+  <script src="loja.js"></script>
   <script>
-    // Config Firebase (mesma do seu index.html)
-    const firebaseConfig = {
-      apiKey: "AIzaSyBFiGU-blNt7XFO9cjYPoWaPP-c5EEItfc",
-      authDomain: "mrstore-d429f.firebaseapp.com",
-      projectId: "mrstore-d429f",
-      storageBucket: "mrstore-d429f.appspot.com",
-      messagingSenderId: "310913725702",
-      appId: "1:310913725702:web:22775b2fa034b0697e1a87"
-    };
-
-    // Inicializa Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    let usuarioAtual = null;
-    let moedas = 0;
-    let estoque = {};
-
-    // Verifica autenticação
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        usuarioAtual = user;
+    firebase.auth().onAuthStateChanged(user => {
+      if (user && user.email === "sandrachefa@gmail.com") {
+        document.getElementById('btn-gerenciar-notas').style.display = "inline-block";
+        document.getElementById('nome-usuario').innerText = "Sandra";
+      } else if (user) {
         document.getElementById('nome-usuario').innerText = user.email;
-        carregarDados();
-        verificarAdmin();
-      } else {
-        window.location.href = 'index.html'; // Não logado, volta para login
       }
     });
-
-    // Mostra botão Admin só para o email admin
-    function verificarAdmin() {
-      const emailAdmin = 'sandrachefa@gmail.com';
-      if (usuarioAtual && usuarioAtual.email === emailAdmin) {
-        document.getElementById('btn-admin').style.display = 'inline-block';
-      }
-    }
-
-    // Redireciona para a página admin
-    function irParaAdmin() {
-      window.location.href = 'admin.html';
-    }
-
-    // Carrega dados do Firestore
-    function carregarDados() {
-      const docRef = db.collection('usuarios').doc(usuarioAtual.uid);
-      docRef.get().then(doc => {
-        if (doc.exists) {
-          const data = doc.data();
-          moedas = data.moedas || 0;
-          estoque = data.estoque || {
-            'bola-nike': 1,
-            'jogos': 1,
-            'educacao': 1,
-            'horta': 1,
-            'jogos-virtuais': 1,
-            'balas': 300,
-            'pirulito': 100,
-            'cinema': 1
-          };
-        } else {
-          moedas = 0;
-          estoque = {
-            'bola-nike': 1,
-            'jogos': 1,
-            'educacao': 1,
-            'horta': 1,
-            'jogos-virtuais': 1,
-            'balas': 300,
-            'pirulito': 100,
-            'cinema': 1
-          };
-          salvarDados();
-        }
-        atualizarInterface();
-      }).catch(error => {
-        alert('Erro ao carregar dados: ' + error);
-      });
-    }
-
-    // Salva dados no Firestore
-    function salvarDados() {
-      db.collection('usuarios').doc(usuarioAtual.uid).set({
-        moedas: moedas,
-        estoque: estoque
-      });
-    }
-
-    // Atualiza interface com dados atuais
-    function atualizarInterface() {
-      document.getElementById('total-moedas').innerText = moedas;
-      for (let produto in estoque) {
-        const estoqueEl = document.getElementById('estoque-' + produto);
-        const btnEl = document.getElementById('btn-' + produto);
-        if (estoqueEl) estoqueEl.innerText = 'Estoque: ' + estoque[produto];
-        if (btnEl) btnEl.disabled = estoque[produto] <= 0;
-      }
-    }
-
-    // Ganhar 1 moeda
-    function ganharMoeda() {
-      moedas++;
-      salvarDados();
-      atualizarInterface();
-    }
-
-    // Comprar produto
-    function comprarProduto(preco, produto) {
-      if (moedas >= preco && estoque[produto] > 0) {
-        moedas -= preco;
-        estoque[produto]--;
-        salvarDados();
-        atualizarInterface();
-        alert("Você comprou o " + produto + " com sucesso!");
-      } else {
-        alert("Você não tem moedas suficientes ou o estoque acabou.");
-      }
-    }
-
-    // Logout Firebase
-    function logout() {
-      auth.signOut().then(() => {
-        window.location.href = 'index.html';
-      });
-    }
   </script>
 </body>
 </html>

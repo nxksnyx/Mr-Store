@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gerenciar Notas - MrStore</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    select, input {
+      padding: 8px;
+      margin: 5px 0;
+      width: 100%;
+    }
+    .aluno {
+      background: #fff;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .aluno h4 {
+      margin: 0 0 10px;
+    }
+    button {
+      padding: 8px 12px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #media-sala, #moedas-sala {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    #log-compras {
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 30px;
+      border: 1px solid #ccc;
+    }
+    #log-compras h3 {
+      margin-top: 0;
+    }
+    .log-item {
+      padding: 5px 0;
+      border-bottom: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+  <h1>Gerenciar Notas</h1>
+  <label for="select-sala">Selecione a Sala:</label>
+  <select id="select-sala">
+    <option value="">-- Escolha uma sala --</option>
+    <option>6 A</option><option>6 B</option><option>6 C</option>
+    <option>7 A</option><option>7 C</option>
+    <option>8 A</option><option>8 B</option><option>8 C</option><option>8 D</option>
+    <option>9 A</option><option>9 B</option><option>9 C</option>
+  </select>
+
+  <div id="alunos"></div>
+  <div id="media-sala"></div>
+  <div id="moedas-sala"></div>
+
+  <div id="log-compras">
+    <h3>Log de Compras</h3>
+    <div id="log-lista">Carregando logs...</div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBFiGU-blNt7XFO9cjYPoWaPP-c5EEItfc",
+      authDomain: "mrstore-d429f.firebaseapp.com",
+      projectId: "mrstore-d429f",
+      storageBucket: "mrstore-d429f.appspot.com",
+      messagingSenderId: "310913725702",
+      appId: "1:310913725702:web:22775b2fa034b0697e1a87"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    const selectSala = document.getElementById('select-sala');
+    const alunosContainer = document.getElementById('alunos');
+    const mediaSalaDisplay = document.getElementById('media-sala');
+    const moedasSalaDisplay = document.getElementById('moedas-sala');
+    const logLista = document.getElementById('log-lista');
+
+    auth.onAuthStateChanged(user => {
+      if (!user || user.email !== "sandrachefa@gmail.com") {
+        alert("Acesso restrito à administradora.");
+        window.location.href = "index.html";
+      } else {
+        carregarLogs();
+      }
+    });
+
+    selectSala.addEventListener("change", () => {
+      const sala = selectSala.value;
+      carregarAlunosSala(sala);
+    });
+
+    function carregarAlunosSala(sala) {
+      alunosContainer.innerHTML = '';
+      mediaSalaDisplay.innerHTML = '';
+      moedasSalaDisplay.innerHTML = '';
+
+      db.collection('salas').doc(sala).get().then(async salaDoc => {
+        const salaData = salaDoc.data();
+        const alunoUIDs = salaData?.alunos || [];
+
+        if (alunoUIDs.length === 0) {
+          alunosContainer.innerHTML = "<p>Nenhum aluno registrado nesta sala.</p>";
+          return;
+        }
+
+        let somaTotal = 0;
+        let alunosComNotas = 0;
+        let totalMoedas = 0;
+
+        for (const uid of alunoUIDs) {
+          const userDoc = await db.collection('users').doc(uid).get();
+          const aluno = userDoc.data() || {};
+          const div = document.createElement('div');
+          div.className = 'aluno';
+
+          const p1 = aluno.projeto1 ?? '';
+          const p2 = aluno.projeto2 ?? '';
+          const tec = aluno.tecnologia ?? '';
+          const paul = aluno.paulista ?? '';
+          const moedas = aluno.moedas ?? 0;
+
+          div.innerHTML = `
+            <h4>${aluno.nome || aluno.email || uid}</h4>
+            <label>Projeto 1:</label>
+            <input type="number" id="p1-${uid}" value="${p1}" step="0.01">
+            <label>Projeto 2:</label>
+            <input type="number" id="p2-${uid}" value="${p2}" step="0.01">
+            <label>Avaliação de Tecnologia:</label>
+            <input type="number" id="tec-${uid}" value="${tec}" step="0.01">
+            <label>Prova Paulista:</label>
+            <input type="number" id="paul-${uid}" value="${paul}" step="0.01">
+            <button onclick="salvar('${uid}')">Salvar</button>
+          `;
+          alunosContainer.appendChild(div);
+
+          const notas = [p1, p2, tec, paul].map(n => parseFloat(n));
+          const validas = notas.filter(n => !isNaN(n));
+          if (validas.length > 0) {
+            const mediaAluno = validas.reduce((a, b) => a + b, 0) / validas.length;
+            somaTotal += mediaAluno;
+            alunosComNotas++;
+          }
+
+          totalMoedas += moedas;
+        }
+
+        if (alunosComNotas > 0) {
+          const media = (somaTotal / alunosComNotas).toFixed(2);
+          mediaSalaDisplay.innerHTML = `
+            <hr>
+            <label>Média da Sala:</label>
+            <input type="number" id="media-sala-input" value="${media}" step="0.01">
+            <button onclick="salvarMedia('${sala}')">Salvar Média</button>
+          `;
+        }
+
+        moedasSalaDisplay.innerHTML = `
+          <label>Total de Moedas da Sala:</label>
+          <input type="number" value="${totalMoedas}" readonly>
+        `;
+      });
+    }
+
+window.salvar = function (uid) {
+  const projeto1 = parseFloat(document.getElementById(`p1-${uid}`).value);
+  const projeto2 = parseFloat(document.getElementById(`p2-${uid}`).value);
+  const tecnologia = parseFloat(document.getElementById(`tec-${uid}`).value);
+  const paulista = parseFloat(document.getElementById(`paul-${uid}`).value);
+
+  const notas = [projeto1, projeto2, tecnologia, paulista];
+  const somaNotasValidas = notas
+    .filter(n => !isNaN(n))
+    .reduce((a, b) => a + b, 0);
+
+  const moedasCalculadas = Math.min(Math.floor(somaNotasValidas) * 5, 200);
+
+  db.collection('users').doc(uid).set({
+    projeto1,
+    projeto2,
+    tecnologia,
+    paulista,
+    moedas: moedasCalculadas
+  }, { merge: true }).then(() => {
+    alert(`Notas e moedas salvas! O aluno ganhou ${moedasCalculadas} moedas.`);
+  }).catch(err => {
+    alert("Erro ao salvar notas: " + err.message);
+  });
+}
+
+
+    window.salvarMedia = function (sala) {
+      const media = parseFloat(document.getElementById('media-sala-input').value);
+      if (!isNaN(media)) {
+        db.collection('salas').doc(sala).set({ media }, { merge: true }).then(() => {
+          alert("Média da sala salva!");
+        });
+      }
+    }
+
+    function carregarLogs() {
+      db.collection("logs").orderBy("data", "desc").limit(20).onSnapshot(snapshot => {
+        logLista.innerHTML = '';
+        if (snapshot.empty) {
+          logLista.innerHTML = "<p>Nenhuma compra registrada.</p>";
+          return;
+        }
+
+        snapshot.forEach(doc => {
+          const log = doc.data();
+          const data = new Date(log.data?.toDate()).toLocaleString("pt-BR");
+          const item = document.createElement("div");
+          item.className = "log-item";
+          item.innerHTML = `<strong>${log.nome}</strong> da sala <strong>${log.sala}</strong> comprou <strong>${log.produto}</strong> em ${data}`;
+          logLista.appendChild(item);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

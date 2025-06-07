@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -20,11 +19,9 @@
       align-items: center;
       color: white;
     }
-
     .header {
       text-align: center;
     }
-
     .form-container {
       background: rgba(0, 0, 0, 0.7);
       padding: 20px;
@@ -34,14 +31,12 @@
       gap: 10px;
       width: 300px;
     }
-
-    input {
+    input, select {
       padding: 10px;
       border-radius: 5px;
       border: 1px solid #ccc;
       font-size: 1rem;
     }
-
     button {
       background-color: #FFD700;
       color: black;
@@ -52,10 +47,14 @@
       font-weight: bold;
       margin-top: 10px;
     }
-
     a {
       color: #FFD700;
       cursor: pointer;
+    }
+    .extra-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
   </style>
 </head>
@@ -67,7 +66,19 @@
 
   <div class="form-container">
     <h2 id="form-title">Cadastro</h2>
-    <input type="email" id="email" placeholder="E-mail" />
+
+    <div class="extra-fields" id="extra-fields">
+      <input type="text" id="nome-completo" placeholder="Nome completo" />
+      <select id="sala" required>
+        <option value="">Selecione a sala</option>
+        <option>6 A</option><option>6 B</option><option>6 C</option>
+        <option>7 A</option><option>7 C</option>
+        <option>8 A</option><option>8 B</option><option>8 C</option><option>8 D</option>
+        <option>9 A</option><option>9 B</option><option>9 C</option>
+      </select>
+    </div>
+
+    <input type="email" id="email" placeholder="E-mail institucional" />
     <input type="password" id="password" placeholder="Senha" />
     <button onclick="processarAuth()">Cadastrar</button>
     <p>Já tem uma conta? <a onclick="toggleForm()">Fazer login</a></p>
@@ -79,7 +90,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <script>
-    // Configuração do Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBFiGU-blNt7XFO9cjYPoWaPP-c5EEItfc",
       authDomain: "mrstore-d429f.firebaseapp.com",
@@ -88,67 +98,91 @@
       messagingSenderId: "310913725702",
       appId: "1:310913725702:web:22775b2fa034b0697e1a87"
     };
-
-    // Inicializa Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    function toggleForm() {
-      const title = document.getElementById('form-title');
-      const btn = document.querySelector('button');
-      const link = document.querySelector('a');
+    const formTitle = document.getElementById('form-title');
+    const extraFields = document.getElementById('extra-fields');
+    const btn = document.querySelector('button');
+    const link = document.querySelector('a');
 
-      if (title.innerText === 'Cadastro') {
-        title.innerText = 'Login';
-        btn.innerText = 'Entrar';
-        link.innerText = 'Cadastrar';
-      } else {
-        title.innerText = 'Cadastro';
-        btn.innerText = 'Cadastrar';
-        link.innerText = 'Fazer login';
-      }
+    function toggleForm() {
+      const isCadastro = formTitle.innerText !== 'Cadastro';
+      formTitle.innerText = isCadastro ? 'Cadastro' : 'Login';
+      btn.innerText = isCadastro ? 'Cadastrar' : 'Entrar';
+      link.innerText = isCadastro ? 'Fazer login' : 'Cadastrar';
+      extraFields.style.display = isCadastro ? 'flex' : 'none';
     }
 
-    function salvarUsuarioNoFirestore(user) {
-      const userDocRef = db.collection('users').doc(user.uid);
-      return userDocRef.set({
+    window.addEventListener('DOMContentLoaded', () => {
+      formTitle.innerText = 'Cadastro';
+      btn.innerText = 'Cadastrar';
+      link.innerText = 'Fazer login';
+      extraFields.style.display = 'flex';
+    });
+
+    function inicializarDados(user, nome = null, sala = null) {
+      const userRef = db.collection('users').doc(user.uid);
+      const salaRef = sala ? db.collection('salas').doc(sala) : null;
+
+      const dadosIniciais = {
+        nome: nome || "Sem nome",
         email: user.email,
-        mrcoin: 0,
-        estoque: {}
-      }, { merge: true });
+        sala: sala || "",
+        moedas: 0,
+        projeto1: 0,
+        projeto2: 0,
+        tecnologia: 0,
+        paulista: 0
+      };
+
+      const produtosVotacao = [
+        'aula_cinema', 'aula_fisica', 'aula_horta',
+        'aula_jogos', 'aula_ping', 'jogos_virtuais'
+      ];
+
+      const investimentosIniciais = {};
+      produtosVotacao.forEach(produto => {
+        investimentosIniciais[`investimentos.${produto}`] = firebase.firestore.FieldValue.increment(0);
+      });
+
+      return userRef.set(dadosIniciais).then(() => {
+        if (salaRef) {
+          return salaRef.set({
+            ...investimentosIniciais,
+            alunos: firebase.firestore.FieldValue.arrayUnion(user.uid)
+          }, { merge: true });
+        }
+      });
     }
 
     function processarAuth() {
-      const email = document.getElementById('email').value;
+      const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      const isLogin = document.getElementById('form-title').innerText === 'Login';
+      const isLogin = formTitle.innerText === 'Login';
 
       if (!email || !password) {
-        alert("Por favor, preencha email e senha.");
+        alert("Preencha e-mail e senha.");
         return;
       }
 
-      if (isLogin) {
-        auth.signInWithEmailAndPassword(email, password)
-          .then(({ user }) => {
-            return salvarUsuarioNoFirestore(user); // garante criar/atualizar doc no Firestore
-          })
-          .then(() => {
-            localStorage.setItem('usuario_logado', email);
-            window.location.href = 'loja.html';
-          })
-          .catch(err => alert('Erro: ' + err.message));
-      } else {
+      if (!isLogin) {
+        const nome = document.getElementById('nome-completo').value.trim();
+        const sala = document.getElementById('sala').value;
+        if (!nome || !sala) {
+          alert("Preencha nome completo e selecione a sala.");
+          return;
+        }
+
         auth.createUserWithEmailAndPassword(email, password)
-          .then(({ user }) => {
-            return salvarUsuarioNoFirestore(user); // salva ao criar conta
-          })
-          .then(() => {
-            localStorage.setItem('usuario_logado', email);
-            window.location.href = 'loja.html';
-          })
-          .catch(err => alert('Erro: ' + err.message));
+          .then(({ user }) => inicializarDados(user, nome, sala))
+          .then(() => window.location.href = 'loja.html')
+          .catch(err => alert("Erro no cadastro: " + err.message));
+      } else {
+        auth.signInWithEmailAndPassword(email, password)
+          .then(() => window.location.href = 'loja.html')
+          .catch(err => alert("Erro no login: " + err.message));
       }
     }
   </script>

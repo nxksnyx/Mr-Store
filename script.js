@@ -1,16 +1,15 @@
-<!-- Coloque no topo do seu HTML -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
   const firebaseConfig = {
-  apiKey: "AIzaSyBFiGU-blNt7XFO9cjYPoWaPP-c5EEItfc",
-  authDomain: "mrstore-d429f.firebaseapp.com",
-  projectId: "mrstore-d429f",
-  storageBucket: "mrstore-d429f.firebasestorage.app",
-  messagingSenderId: "310913725702",
-  appId: "1:310913725702:web:22775b2fa034b0697e1a87"
+    apiKey: "AIzaSyBFiGU-blNt7XFO9cjYPoWaPP-c5EEItfc",
+    authDomain: "mrstore-d429f.firebaseapp.com",
+    projectId: "mrstore-d429f",
+    storageBucket: "mrstore-d429f.appspot.com",
+    messagingSenderId: "310913725702",
+    appId: "1:310913725702:web:22775b2fa034b0697e1a87"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -21,6 +20,13 @@
   async function fazerCadastro() {
     const email = document.getElementById('cadastro-username').value;
     const senha = document.getElementById('cadastro-password').value;
+    const nome = document.getElementById('nome-completo').value;
+    const sala = document.getElementById('sala').value;
+
+    if (!email || !senha || !nome || !sala) {
+      alert("Por favor, preencha todos os campos.");
+      return;
+    }
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
@@ -28,8 +34,10 @@
 
       await setDoc(doc(db, "users", user.uid), {
         email: email,
-        mrcoins: 100,
-        admin: false // Por padrão, não é admin
+        nome: nome,
+        sala: sala,
+        moedas: 100,
+        admin: false
       });
 
       alert("Cadastro realizado com sucesso!");
@@ -43,6 +51,11 @@
   async function fazerLogin() {
     const email = document.getElementById('login-username').value;
     const senha = document.getElementById('login-password').value;
+
+    if (!email || !senha) {
+      alert("Por favor, preencha todos os campos.");
+      return;
+    }
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, senha);
@@ -67,18 +80,7 @@
     }
   }
 
-  // Funções para exibir telas
-  window.mostrarCadastro = function () {
-    document.getElementById('cadastro-container').style.display = 'block';
-    document.getElementById('login-container').style.display = 'none';
-  }
-
-  window.mostrarLogin = function () {
-    document.getElementById('cadastro-container').style.display = 'none';
-    document.getElementById('login-container').style.display = 'block';
-  }
-
-  // Expor funções no escopo global
+  // Expor funções globalmente
   window.fazerCadastro = fazerCadastro;
   window.fazerLogin = fazerLogin;
 </script>
