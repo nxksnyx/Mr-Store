@@ -26,7 +26,9 @@ const produtosColetivos = [
 ];
 
 const produtosInfo = {
-  bola_nike: { nome: "Bola da Nike", imagem: "https://static.netshoes.com.br/produtos/bola-de-futebol-campo-nike-merlin-cbf/14/HZM-2881-114/HZM-2881-114_zoom2.jpg" },
+  bola_nike: { nome: "Bola da Nike", imagem: "https://i.imgur.com/W72fkUd.png" },
+  bola_volei: { nome: "Bola de Volei", imagem: "https://i.imgur.com/utdBdq1.png" },
+  bola_basquete: { nome: "Bola de Basquete", imagem: "https://i.imgur.com/hxSv0Ts.png" },
   aula_jogos: { nome: "Aula com jogos e brincadeiras na área externa", imagem: "https://i.imgur.com/rRKueT4.jpeg" },
   aula_ping: { nome: "Aula com jogos e brincadeiras no pátio", imagem: "https://i.imgur.com/o48S1TL.jpeg" },
   aula_fisica: { nome: "Aula extra de educação física", imagem: "https://jundiai.sp.gov.br/noticias/wp-content/uploads/sites/32/2018/11/emeb_marcos_gasparian-166.jpg" },
