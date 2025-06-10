@@ -26,7 +26,8 @@ const produtosColetivos = [
 ];
 
 const produtosInfo = {
-  bola_nike: { nome: "Bola da Nike", imagem: "https://i.imgur.com/W72fkUd.png" },
+  bola: { nome: "Bola de Futebol", imagem: "https://i.imgur.com/W72fkUd.png" },
+  bola_nike: { nome: "Bola da Nike", imagem: " " },
   bola_volei: { nome: "Bola de Volei", imagem: "https://i.imgur.com/utdBdq1.png" },
   bola_basquete: { nome: "Bola de Basquete", imagem: "https://i.imgur.com/hxSv0Ts.png" },
   aula_jogos: { nome: "Aula com jogos e brincadeiras na área externa", imagem: "https://i.imgur.com/rRKueT4.jpeg" },
