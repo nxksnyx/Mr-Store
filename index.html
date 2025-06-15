@@ -78,7 +78,7 @@
       </select>
     </div>
 
-    <input type="email" id="email" placeholder="E-mail institucional" />
+    <input type="text" id="ra" placeholder="RA do aluno" />
     <input type="password" id="password" placeholder="Senha" />
     <button onclick="processarAuth()">Cadastrar</button>
     <p>Já tem uma conta? <a onclick="toggleForm()">Fazer login</a></p>
@@ -122,12 +122,17 @@
       extraFields.style.display = 'flex';
     });
 
-    function inicializarDados(user, nome = null, sala = null) {
+    function formatarEmail(ra) {
+      return `${ra.trim()}@ra.com`.toLowerCase();
+    }
+
+    function inicializarDados(user, nome = null, sala = null, ra = null) {
       const userRef = db.collection('users').doc(user.uid);
       const salaRef = sala ? db.collection('salas').doc(sala) : null;
 
       const dadosIniciais = {
         nome: nome || "Sem nome",
+        ra: ra || "",
         email: user.email,
         sala: sala || "",
         moedas: 0,
@@ -157,34 +162,52 @@
       });
     }
 
-    function processarAuth() {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      const isLogin = formTitle.innerText === 'Login';
+function processarAuth() {
+  const identificador = document.getElementById('ra').value.trim(); // pode ser RA ou email
+  const password = document.getElementById('password').value;
+  const isLogin = formTitle.innerText === 'Login';
 
-      if (!email || !password) {
-        alert("Preencha e-mail e senha.");
-        return;
-      }
+  if (!identificador || !password) {
+    alert("Preencha RA ou e-mail e a senha.");
+    return;
+  }
 
-      if (!isLogin) {
-        const nome = document.getElementById('nome-completo').value.trim();
-        const sala = document.getElementById('sala').value;
-        if (!nome || !sala) {
-          alert("Preencha nome completo e selecione a sala.");
-          return;
-        }
+  const isEmail = identificador.includes("@");
+  let emailFake;
 
-        auth.createUserWithEmailAndPassword(email, password)
-          .then(({ user }) => inicializarDados(user, nome, sala))
-          .then(() => window.location.href = 'loja.html')
-          .catch(err => alert("Erro no cadastro: " + err.message));
-      } else {
-        auth.signInWithEmailAndPassword(email, password)
-          .then(() => window.location.href = 'loja.html')
-          .catch(err => alert("Erro no login: " + err.message));
-      }
+  if (isEmail) {
+    if (identificador !== "sandrachefa@gmail.com") {
+      alert("Apenas a administradora pode usar e-mail para login. Use seu RA.");
+      return;
     }
+    emailFake = identificador;
+  } else {
+    emailFake = `${identificador}@ra.com`.toLowerCase();
+  }
+
+  if (!isLogin) {
+    if (isEmail) {
+      alert("Somente alunos podem se cadastrar. Use o RA.");
+      return;
+    }
+
+    const nome = document.getElementById('nome-completo').value.trim();
+    const sala = document.getElementById('sala').value;
+    if (!nome || !sala) {
+      alert("Preencha nome completo e selecione a sala.");
+      return;
+    }
+
+    auth.createUserWithEmailAndPassword(emailFake, password)
+      .then(({ user }) => inicializarDados(user, nome, sala, identificador))
+      .then(() => window.location.href = 'loja.html')
+      .catch(err => alert("Erro no cadastro: " + err.message));
+  } else {
+    auth.signInWithEmailAndPassword(emailFake, password)
+      .then(() => window.location.href = 'loja.html')
+      .catch(err => alert("Erro no login: " + err.message));
+  }
+}
   </script>
 </body>
 </html>

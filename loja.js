@@ -65,7 +65,7 @@ auth.onAuthStateChanged(user => {
     document.getElementById("nota-projeto2").innerText = data.projeto2 ?? "-";
     document.getElementById("nota-tecnologia").innerText = data.tecnologia ?? "-";
     document.getElementById("nota-paulista").innerText = data.paulista ?? "-";
-    document.getElementById('total-moedas').innerText = moedas;
+    document.getElementById("total-moedas").innerText = moedas;
 
     if (userEmail === "sandrachefa@gmail.com") {
       const btnNotas = document.getElementById("btn-gerenciar-notas");
@@ -106,6 +106,12 @@ auth.onAuthStateChanged(user => {
     document.getElementById("media-paulista").innerText = cont[3] ? (somas[3] / cont[3]).toFixed(1) : "-";
 
     renderizarProdutos();
+
+    // Carregar todos os rankings
+    carregarRankingPeriodo("semana", "aluno");
+    carregarRankingPeriodo("semana", "sala");
+    carregarRankingPeriodo("mes", "aluno");
+    carregarRankingPeriodo("mes", "sala");
   });
 });
 
@@ -115,12 +121,6 @@ function logout() {
 
 function irParaGerenciarNotas() {
   window.location.href = "gerenciar_notas.html";
-}
-
-function ganharMoeda() {
-  moedas++;
-  document.getElementById("total-moedas").innerText = moedas;
-  db.collection("users").doc(userId).update({ moedas });
 }
 
 function renderizarProdutos() {
@@ -230,4 +230,49 @@ function comprarProduto(produtoId) {
     alert("Compra realizada com sucesso!");
     renderizarProdutos();
   }
+}
+
+function carregarRankingPeriodo(tipo, escopo) {
+  const dias = tipo === "semana" ? 7 : 30;
+  const dataLimite = new Date();
+  dataLimite.setDate(dataLimite.getDate() - dias);
+  const limiteTimestamp = firebase.firestore.Timestamp.fromDate(dataLimite);
+
+  const containerId = `ranking-${tipo}-${escopo === "aluno" ? "alunos" : "salas"}`;
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  db.collection("logs")
+    .where("data", ">=", limiteTimestamp)
+    .get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        container.innerHTML = "<p>Nenhum dado encontrado.</p>";
+        return;
+      }
+
+      const acumulado = {};
+
+      snapshot.forEach(doc => {
+        const log = doc.data();
+        const chave = escopo === "aluno" ? log.nome || "Desconhecido" : log.sala || "Sem Sala";
+        acumulado[chave] = (acumulado[chave] || 0) + 1;
+      });
+
+      const rankingArray = Object.entries(acumulado)
+        .sort((a, b) => b[1] - a[1])  // ordena decrescente por quantidade
+        .slice(0, 10);               // top 10
+
+      let html = "<ol>";
+      rankingArray.forEach(([nomeOuSala, count]) => {
+        html += `<li>${nomeOuSala}: ${count} compra${count > 1 ? "s" : ""}</li>`;
+      });
+      html += "</ol>";
+
+      container.innerHTML = html;
+    })
+    .catch(error => {
+      console.error("Erro ao carregar ranking:", error);
+      container.innerHTML = "<p>Erro ao carregar ranking.</p>";
+    });
 }

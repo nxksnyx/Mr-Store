@@ -16,21 +16,18 @@
       padding: 20px;
       min-height: 100vh;
     }
-
     .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
     }
-
     .container {
       display: flex;
       flex-wrap: wrap;
       gap: 20px;
     }
-
-    .product-list, .total {
+    .product-list, .total, .ranking-box {
       background: rgba(0, 0, 0, 0.7);
       color: white;
       padding: 20px;
@@ -38,7 +35,6 @@
       flex: 1;
       min-width: 300px;
     }
-
     .product {
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid #ddd;
@@ -47,14 +43,12 @@
       margin-bottom: 15px;
       text-align: center;
     }
-
     .product img {
       max-width: 100%;
       height: auto;
       margin-bottom: 10px;
       max-height: 200px;
     }
-
     button {
       background-color: #FFD700;
       color: black;
@@ -65,12 +59,10 @@
       font-weight: bold;
       margin-top: 10px;
     }
-
     button:disabled {
       background-color: #ccc;
       cursor: not-allowed;
     }
-
     #btn-gerenciar-notas {
       background-color: #32CD32;
       color: white;
@@ -82,20 +74,21 @@
       border: none;
       display: none;
     }
-
     .notas-container {
       background: rgba(0, 0, 0, 0.7);
       padding: 15px;
       margin-top: 20px;
       border-radius: 10px;
     }
-
     .notas-container h4 {
       margin: 0 0 10px 0;
     }
-
     .notas-container p {
       margin: 5px 0;
+    }
+    .ranking-box .log-item {
+      padding: 5px 0;
+      border-bottom: 1px solid #ddd;
     }
   </style>
 </head>
@@ -114,24 +107,37 @@
       <div id="product-list"></div>
     </div>
 
-    <div class="total">
-      <h3>Total de Mrcoin: <span id="total-moedas">0</span></h3>
+ 
+<!-- omitido topo do HTML, já conhecido -->
+<div class="total">
+  <h3>Total de Mrcoin: <span id="total-moedas">0</span></h3>
 
-      <div class="notas-container">
-        <h4>Suas Notas</h4>
-        <p>Projeto 1: <span id="nota-projeto1">-</span></p>
-        <p>Projeto 2: <span id="nota-projeto2">-</span></p>
-        <p>Avaliação de Tecnologia: <span id="nota-tecnologia">-</span></p>
-        <p>Prova Paulista: <span id="nota-paulista">-</span></p>
+  <div class="notas-container">
+    <h4>Suas Notas</h4>
+    <p>Projeto 1: <span id="nota-projeto1">-</span></p>
+    <p>Projeto 2: <span id="nota-projeto2">-</span></p>
+    <p>Avaliação de Tecnologia: <span id="nota-tecnologia">-</span></p>
+    <p>Prova Paulista: <span id="nota-paulista">-</span></p>
 
-        <h4>Média da Sala</h4>
-        <p>Projeto 1: <span id="media-projeto1">-</span></p>
-        <p>Projeto 2: <span id="media-projeto2">-</span></p>
-        <p>Avaliação de Tecnologia: <span id="media-tecnologia">-</span></p>
-        <p>Prova Paulista: <span id="media-paulista">-</span></p>
-      </div>
-    </div>
+    <h4>Média da Sala</h4>
+    <p>Projeto 1: <span id="media-projeto1">-</span></p>
+    <p>Projeto 2: <span id="media-projeto2">-</span></p>
+    <p>Avaliação de Tecnologia: <span id="media-tecnologia">-</span></p>
+    <p>Prova Paulista: <span id="media-paulista">-</span></p>
   </div>
+
+  <div class="ranking-box">
+    <h4>🏆 Top Alunos da Semana</h4>
+    <div id="ranking-semana-alunos">Carregando...</div>
+    <h4>🌟 Top Salas da Semana</h4>
+    <div id="ranking-semana-salas">Carregando...</div>
+    <h4>🏆 Top Alunos do Mês</h4>
+    <div id="ranking-mes-alunos">Carregando...</div>
+    <h4>🌟 Top Salas do Mês</h4>
+    <div id="ranking-mes-salas">Carregando...</div>
+  </div>
+</div>
+
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -141,11 +147,17 @@
   <script src="loja.js"></script>
   <script>
     firebase.auth().onAuthStateChanged(user => {
-      if (user && user.email === "sandrachefa@gmail.com") {
+      if (!user) return;
+      const uid = user.uid;
+      const email = user.email;
+      if (email === "sandrachefa@gmail.com") {
         document.getElementById('btn-gerenciar-notas').style.display = "inline-block";
         document.getElementById('nome-usuario').innerText = "Sandra";
-      } else if (user) {
-        document.getElementById('nome-usuario').innerText = user.email;
+      } else {
+        firebase.firestore().collection("users").doc(uid).get().then(doc => {
+          const data = doc.data();
+          document.getElementById('nome-usuario').innerText = data?.nome || "Aluno";
+        });
       }
     });
   </script>
