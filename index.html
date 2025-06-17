@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MrStore - Cadastro/Login</title>
+  <title>MrStore - Login</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -31,7 +31,7 @@
       gap: 10px;
       width: 300px;
     }
-    input, select {
+    input {
       padding: 10px;
       border-radius: 5px;
       border: 1px solid #ccc;
@@ -47,15 +47,6 @@
       font-weight: bold;
       margin-top: 10px;
     }
-    a {
-      color: #FFD700;
-      cursor: pointer;
-    }
-    .extra-fields {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
   </style>
 </head>
 <body>
@@ -65,23 +56,10 @@
   </div>
 
   <div class="form-container">
-    <h2 id="form-title">Cadastro</h2>
-
-    <div class="extra-fields" id="extra-fields">
-      <input type="text" id="nome-completo" placeholder="Nome completo" />
-      <select id="sala" required>
-        <option value="">Selecione a sala</option>
-        <option>6 A</option><option>6 B</option><option>6 C</option>
-        <option>7 A</option><option>7 B</option><option>7 C</option>
-        <option>8 A</option><option>8 B</option><option>8 C</option><option>8 D</option>
-        <option>9 A</option><option>9 B</option><option>9 C</option>
-      </select>
-    </div>
-
-    <input type="text" id="ra" placeholder="RA do aluno" />
+    <h2>Login</h2>
+    <input type="text" id="ra" placeholder="RA do aluno (com ou sem) digito" />
     <input type="password" id="password" placeholder="Senha" />
-    <button onclick="processarAuth()">Cadastrar</button>
-    <p>Já tem uma conta? <a onclick="toggleForm()">Fazer login</a></p>
+    <button onclick="processarAuth()">Entrar</button>
   </div>
 
   <!-- Firebase SDKs -->
@@ -100,114 +78,33 @@
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const db = firebase.firestore();
 
-    const formTitle = document.getElementById('form-title');
-    const extraFields = document.getElementById('extra-fields');
-    const btn = document.querySelector('button');
-    const link = document.querySelector('a');
+    function processarAuth() {
+      const identificador = document.getElementById('ra').value.trim();
+      const password = document.getElementById('password').value;
 
-    function toggleForm() {
-      const isCadastro = formTitle.innerText !== 'Cadastro';
-      formTitle.innerText = isCadastro ? 'Cadastro' : 'Login';
-      btn.innerText = isCadastro ? 'Cadastrar' : 'Entrar';
-      link.innerText = isCadastro ? 'Fazer login' : 'Cadastrar';
-      extraFields.style.display = isCadastro ? 'flex' : 'none';
-    }
+      if (!identificador || !password) {
+        alert("Preencha RA ou e-mail e a senha.");
+        return;
+      }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      formTitle.innerText = 'Cadastro';
-      btn.innerText = 'Cadastrar';
-      link.innerText = 'Fazer login';
-      extraFields.style.display = 'flex';
-    });
+      const isEmail = identificador.includes("@");
+      let emailFake;
 
-    function formatarEmail(ra) {
-      return `${ra.trim()}@ra.com`.toLowerCase();
-    }
-
-    function inicializarDados(user, nome = null, sala = null, ra = null) {
-      const userRef = db.collection('users').doc(user.uid);
-      const salaRef = sala ? db.collection('salas').doc(sala) : null;
-
-      const dadosIniciais = {
-        nome: nome || "Sem nome",
-        ra: ra || "",
-        email: user.email,
-        sala: sala || "",
-        moedas: 0,
-        projeto1: 0,
-        projeto2: 0,
-        tecnologia: 0,
-        paulista: 0
-      };
-
-      const produtosVotacao = [
-        'aula_cinema', 'aula_fisica', 'aula_horta',
-        'aula_jogos', 'aula_ping', 'jogos_virtuais'
-      ];
-
-      const investimentosIniciais = {};
-      produtosVotacao.forEach(produto => {
-        investimentosIniciais[`investimentos.${produto}`] = firebase.firestore.FieldValue.increment(0);
-      });
-
-      return userRef.set(dadosIniciais).then(() => {
-        if (salaRef) {
-          return salaRef.set({
-            ...investimentosIniciais,
-            alunos: firebase.firestore.FieldValue.arrayUnion(user.uid)
-          }, { merge: true });
+      if (isEmail) {
+        if (identificador !== "sandrachefa@gmail.com") {
+          alert("Apenas a administradora pode usar e-mail para login. Use seu RA.");
+          return;
         }
-      });
+        emailFake = identificador;
+      } else {
+        emailFake = `${identificador}@ra.com`.toLowerCase();
+      }
+
+      auth.signInWithEmailAndPassword(emailFake, password)
+        .then(() => window.location.href = 'loja.html')
+        .catch(err => alert("Erro no login: " + err.message));
     }
-
-function processarAuth() {
-  const identificador = document.getElementById('ra').value.trim(); // pode ser RA ou email
-  const password = document.getElementById('password').value;
-  const isLogin = formTitle.innerText === 'Login';
-
-  if (!identificador || !password) {
-    alert("Preencha RA ou e-mail e a senha.");
-    return;
-  }
-
-  const isEmail = identificador.includes("@");
-  let emailFake;
-
-  if (isEmail) {
-    if (identificador !== "sandrachefa@gmail.com") {
-      alert("Apenas a administradora pode usar e-mail para login. Use seu RA.");
-      return;
-    }
-    emailFake = identificador;
-  } else {
-    emailFake = `${identificador}@ra.com`.toLowerCase();
-  }
-
-  if (!isLogin) {
-    if (isEmail) {
-      alert("Somente alunos podem se cadastrar. Use o RA.");
-      return;
-    }
-
-    const nome = document.getElementById('nome-completo').value.trim();
-    const sala = document.getElementById('sala').value;
-    if (!nome || !sala) {
-      alert("Preencha nome completo e selecione a sala.");
-      return;
-    }
-
-    auth.createUserWithEmailAndPassword(emailFake, password)
-      .then(({ user }) => inicializarDados(user, nome, sala, identificador))
-      .then(() => window.location.href = 'loja.html')
-      .catch(err => alert("Erro no cadastro: " + err.message));
-  } else {
-    auth.signInWithEmailAndPassword(emailFake, password)
-      .then(() => window.location.href = 'loja.html')
-      .catch(err => alert("Erro no login: " + err.message));
-  }
-}
   </script>
 </body>
 </html>
