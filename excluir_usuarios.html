@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Excluir ou Editar Usuários - MrStore</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f8f9fa;
+    }
+    h1 {
+      text-align: center;
+    }
+    select, input {
+      padding: 8px;
+      margin: 5px 0;
+      width: 100%;
+    }
+    .usuario {
+      background: #fff;
+      padding: 15px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      margin-right: 10px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-salvar { background-color: #28a745; color: white; }
+    .btn-excluir { background-color: #dc3545; color: white; }
+    .btn-voltar { background-color: #007BFF; color: white; }
+  </style>
+</head>
+<body>
+  <h1>Excluir Usuários</h1>
+  <div style="text-align: center;">
+    <button onclick="window.location.href='loja.html'" class="btn-voltar">Voltar para Loja</button>
+  </div>
+
+  <label for="sala-select">Selecione a Sala:</label>
+  <select id="sala-select">
+    <option value="">-- Escolha uma sala --</option>
+    <option>6 A</option><option>6 B</option><option>6 C</option>
+    <option>7 A</option><option>7 B</option><option>7 C</option>
+    <option>8 A</option><option>8 B</option><option>8 C</option><option>8 D</option>
+    <option>9 A</option><option>9 B</option><option>9 C</option>
+  </select>
+
+  <div id="usuarios-lista"></div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBFiGU-blNt7XFO9cjYPoWaPP-c5EEItfc",
+      authDomain: "mrstore-d429f.firebaseapp.com",
+      projectId: "mrstore-d429f",
+      storageBucket: "mrstore-d429f.appspot.com",
+      messagingSenderId: "310913725702",
+      appId: "1:310913725702:web:22775b2fa034b0697e1a87"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    const select = document.getElementById("sala-select");
+    const lista = document.getElementById("usuarios-lista");
+
+    auth.onAuthStateChanged(user => {
+      if (!user || user.email !== "sandrachefa@gmail.com") {
+        alert("Acesso restrito à administradora.");
+        window.location.href = "index.html";
+      }
+    });
+
+    select.addEventListener("change", async () => {
+      const sala = select.value;
+      if (!sala) return;
+      lista.innerHTML = "Carregando...";
+
+      const snapshot = await db.collection("users").where("sala", "==", sala).get();
+      lista.innerHTML = "";
+
+      if (snapshot.empty) {
+        lista.innerHTML = "<p>Nenhum usuário encontrado nesta sala.</p>";
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        const user = doc.data();
+        const div = document.createElement("div");
+        div.className = "usuario";
+        div.innerHTML = `
+          <h4>${user.nome || "(Sem nome definido)"}</h4>
+          <p><strong>Email atual (RA):</strong> ${user.email}</p>
+          <label>Novo RA:</label>
+          <input type="text" id="novo-email-${doc.id}" value="${user.email.replace('@ra.com','')}" />
+          <label>Nova Senha:</label>
+          <input type="password" id="nova-senha-${doc.id}" placeholder="Opcional" />
+          <button class="btn-salvar" onclick="editarUsuario('${doc.id}', '${user.email}')">Salvar Alterações</button>
+          <button class="btn-excluir" onclick="excluirUsuario('${doc.id}', '${user.email}', '${user.sala}')">Excluir Usuário</button>
+        `;
+        lista.appendChild(div);
+      });
+    });
+
+    function editarUsuario(uid, emailAntigo) {
+      const novoRA = document.getElementById(`novo-email-${uid}`).value.trim();
+      const novaSenha = document.getElementById(`nova-senha-${uid}`).value.trim();
+
+      if (!novoRA) return alert("Digite um novo RA.");
+      const novoEmail = `${novoRA}@ra.com`.toLowerCase();
+
+      db.collection("users").doc(uid).update({ email: novoEmail }).then(() => {
+        alert("RA atualizado no Firestore.");
+      });
+
+      if (novaSenha) {
+        alert("Altere a senha pelo console do Firebase ou diretamente com o aluno autenticado.");
+      }
+    }
+
+    async function excluirUsuario(uid, email, sala) {
+      const confirmacao = confirm(`Tem certeza que deseja excluir o usuário ${email} da sala ${sala}?`);
+      if (!confirmacao) return;
+
+      try {
+        await db.collection("users").doc(uid).delete();
+        await db.collection("salas").doc(sala).update({
+          alunos: firebase.firestore.FieldValue.arrayRemove(uid)
+        });
+        alert("Usuário removido do Firestore e da sala.");
+        document.getElementById("sala-select").dispatchEvent(new Event("change"));
+      } catch (err) {
+        alert("Erro ao excluir usuário: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
