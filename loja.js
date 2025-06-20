@@ -163,9 +163,26 @@ function comprarProduto(produtoId) {
 
     if (faltaPara5000 <= 0) return alert("Este produto coletivo já foi comprado pela sala.");
 
-    const valorInvestido = Math.min(moedas, faltaPara5000);
+    const input = prompt(`Quanto você quer investir?`);
+
+    if (!input) return; // Cancelado
+    const valorInvestido = parseInt(input);
+
+    if (isNaN(valorInvestido) || valorInvestido <= 0) {
+      return alert("Valor inválido. Digite um número positivo.");
+    }
+
+    if (valorInvestido > moedas) {
+      return alert("Você não tem moedas suficientes.");
+    }
+
+    if (valorInvestido > faltaPara5000) {
+      return alert("Esse valor ultrapassa o necessário para completar o investimento.");
+    }
+
     const novoTotal = investimentoAtual + valorInvestido;
 
+    // Atualiza Firestore
     db.collection("salas").doc(userSala).update({
       [`investimentos.${produtoId}`]: novoTotal
     });
@@ -205,8 +222,8 @@ function comprarProduto(produtoId) {
     }
 
     renderizarProdutos();
-
   } else {
+    // Produto individual
     if (moedas < preco) return alert("Você não tem moedas suficientes.");
     if ((estoqueGlobal[produtoId] || 0) <= 0) return alert("Produto esgotado.");
 
@@ -231,6 +248,7 @@ function comprarProduto(produtoId) {
     renderizarProdutos();
   }
 }
+
 
 function carregarRankingPeriodo(tipo, escopo) {
   const dias = tipo === "semana" ? 7 : 30;
