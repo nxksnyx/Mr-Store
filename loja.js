@@ -71,14 +71,11 @@ const produtosInfo = {
   aula_cinema: { nome: "Aula de Cinema com Pipoca na sala", imagem: "https://2.bp.blogspot.com/-goes4lu3wsQ/VTl7mzY2lpI/AAAAAAAAGR0/By2X6yTVvZk/s1600/crian%C3%A7as-filmes.jpg" },
   aula_horta: { nome: "Aula na Horta", imagem: "https://i.imgur.com/EDqWAVf.jpeg" },
   jogos_virtuais: { nome: "Aula com Jogos Virtuais", imagem: "https://img.freepik.com/fotos-gratis/criancas-da-escola-usando-tablet-digital-em-sala-de-aula_107420-57955.jpg" },
-  balas: { nome: "Balas", imagem: "https://a-static.mlcdn.com.br/800x560/pacote-bala-7-belo-framboesa-600g-arcor/produtosdemaquiagem/10761p/370cbc11ef578c1c36f9c6bc2996a45b.jpg" },
-  tesoura: { nome: "Tesoura", imagem: "https://i.imgur.com/3ncFBwQ.jpeg" },
   harry_potter: { nome: "Harry Potter e a Ordem da Fênix", imagem: "https://i.imgur.com/u39XPhX.jpeg" },
   fone: { nome: "Fones de ouvido preto", imagem: "https://i.imgur.com/wv0WJpZ.jpeg" },
   fone_latam: { nome: "Fones de ouvido Latam", imagem: "https://i.imgur.com/Ze441oH.jpeg" },
   narizinho: { nome: "Reinações de Narizinho", imagem: "https://i.imgur.com/XKfNUFl.jpeg" },
   resta1: { nome: "Resta 1", imagem: "https://i.imgur.com/s8GRLNb.jpeg" },
-  pirulito: { nome: "Pirulito", imagem: "https://cdn.awsli.com.br/2500x2500/1957/1957771/produto/1047748409ee2f58d9d.jpg" }
 };
 
 auth.onAuthStateChanged(user => {
