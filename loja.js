@@ -60,6 +60,7 @@ const produtosInfo = {
   caneta_colorida: { nome: "Canetas coloridas Bic", imagem: "https://i.imgur.com/QwW2LMQ.jpeg" },
   fini: { nome: "Fini", imagem: "https://i.imgur.com/8Nwj3tF.jpeg" },
   prestigio: { nome: "Prestígio", imagem: "https://i.imgur.com/OeSiuBi.jpeg" },
+  pipoca: { nome: "Pipoca Doce", imagem: "https://i.imgur.com/3mn1jWo.jpeg" },
   truco: { nome: "Truco", imagem: "https://i.imgur.com/Tv4biLS.jpeg" },
   abaco: { nome: "Ábaco", imagem: "https://i.imgur.com/Uqj19CY.jpeg" },
   pega_varetas: { nome: "Pega varetas", imagem: "https://i.imgur.com/d040WoV.jpeg" },
