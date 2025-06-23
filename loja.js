@@ -172,7 +172,7 @@ function renderizarProdutos() {
       <img src="${info.imagem}" alt="${info.nome}"/>
       <p>
         ${produtosColetivos.includes(produtoId)
-          ? `Investimento da Sala: ${investimento}/5000<br>Estoque: ${estoque}`
+          ? `Investimento da Sala: ${investimento}/2000<br>Estoque: ${estoque}`
           : `Preço: ${preco} moedas<br>Estoque: ${estoque}`}
       </p>
       <button ${moedas < preco && !produtosColetivos.includes(produtoId) ? "disabled" : ""} onclick="comprarProduto('${produtoId}')">
@@ -191,9 +191,9 @@ function comprarProduto(produtoId) {
     if (moedas <= 0) return alert("Você não tem moedas suficientes para investir.");
 
     const investimentoAtual = investimentosSala[produtoId] || 0;
-    const faltaPara5000 = 5000 - investimentoAtual;
+    const faltaPara2000 = 2000 - investimentoAtual;
 
-    if (faltaPara5000 <= 0) return alert("Este produto coletivo já foi comprado pela sala.");
+    if (faltaPara2000 <= 0) return alert("Este produto coletivo já foi comprado pela sala.");
 
     const input = prompt(`Quanto você quer investir?`);
 
@@ -208,7 +208,7 @@ function comprarProduto(produtoId) {
       return alert("Você não tem moedas suficientes.");
     }
 
-    if (valorInvestido > faltaPara5000) {
+    if (valorInvestido > faltaPara2000) {
       return alert("Esse valor ultrapassa o necessário para completar o investimento.");
     }
 
@@ -225,7 +225,7 @@ function comprarProduto(produtoId) {
 
     db.collection("users").doc(userId).update({ moedas });
 
-    if (novoTotal >= 5000) {
+    if (novoTotal >= 2000) {
       const estoqueAtual = estoqueGlobal[produtoId] || 0;
       if (estoqueAtual > 0) {
         estoqueGlobal[produtoId] = estoqueAtual - 1;
