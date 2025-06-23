@@ -175,7 +175,7 @@ function renderizarProdutos() {
           ? `Investimento da Sala: ${investimento}/${preco}<br>Estoque: ${estoque}`
           : `Preço: ${preco} moedas<br>Estoque: ${estoque}`}
       </p>
-      <button ${moedas < preco && !produtosColetivos.includes(produtoId) ? "disabled" : ""} onclick="comprarProduto('${produtoId}')">
+      <button onclick="comprarProduto('${produtoId}')">
         ${produtosColetivos.includes(produtoId) ? "Investir" : "Comprar"}
       </button>
     `;
