@@ -225,24 +225,82 @@ window.salvar = function (uid) {
       }
     }
 
-    function carregarLogs() {
-      db.collection("logs").orderBy("data", "desc").limit(20).onSnapshot(snapshot => {
-        logLista.innerHTML = '';
-        if (snapshot.empty) {
-          logLista.innerHTML = "<p>Nenhuma compra registrada.</p>";
-          return;
-        }
+function carregarLogs() {
+  const nomesProdutos = {
+  bola: "Bola de Futebol",
+  bola_nike: "Bola da Nike",
+  bola_volei: "Bola de Volei",
+  bola_basquete: "Bola de Basquete",
+  teclado_standart: "Teclado Standart Keyboard",
+  teclado_knup: "Teclado Knup",
+  teclado_mouse: "Teclado e Mouse Maxtro",
+  mouse_gamer: "Mouse Gamer",
+  mouse: "Mouse",
+  auto_falante: "Mini auto-falante",
+  webcam: "Mini Webcam Maxtro",
+  estojo_stitch: "Estojo escolar Stitch",
+  estojo_bichinhos: "Estojo escolar bichinhos",
+  estojo_roxo: "Estojo escolar roxo",
+  kit_aranha: "Kit escolar, caderno Homem Aranha, régua e tesoura",
+  kit_kitty: "Kit escolar, caderno Hello Kitty, régua e tesoura",
+  kit_bobbie: "Kit copo bobbie goods e lápis de cor",
+  kit_escolar: "Kit escolar",
+  kit_caderno_caneta: "Kit caderno, caneta e lápis",
+  kit_palavras_cor: "Kit caça palavras e lápis de cor",
+  kit_palavras_regua: "Kit caça palavras e régua",
+  kit_desenho_regua: "Kit caderno de desenho e régua",
+  kit_postit_caneta: "Kit post-it e caneta",
+  kit_doces: "Kit doces",
+  kit_doces2: "Kit doces",
+  kit_lixa_gloss: "Kit lixa e gloss",
+  caderno_noturno: "Caderno de desenho noturno",
+  cadernos: "Cadernos",
+  caderno_pato: "Caderno pequeno patinhos",
+  caderno_gato: "Caderno pequeno gatinho",
+  canetinha: "Canetinha 12 cores",
+  caneta_colorida: "Canetas coloridas Bic",
+  fini: "Fini",
+  prestigio: "Prestígio",
+  pipoca: "Pipoca Doce",
+  truco: "Truco",
+  abaco: "Ábaco",
+  pega_varetas: "Pega varetas",
+  lixa_decorativa: "Lixa decorativa",
+  chaveiro_emoji: "Chaveiro emoji",
+  aula_jogos: "Aula com jogos e brincadeiras na área externa",
+  aula_ping: "Aula com jogos e brincadeiras no pátio",
+  aula_fisica: "Aula extra de educação física",
+  aula_cinema: "Aula de Cinema com Pipoca na sala",
+  aula_horta: "Aula na Horta",
+  jogos_virtuais: "Aula com Jogos Virtuais",
+  harry_potter: "Harry Potter e a Ordem da Fênix",
+  fone: "Fones de ouvido preto",
+  fone_latam: "Fones de ouvido Latam",
+  narizinho: "Reinações de Narizinho",
+  resta1: "Resta 1",
+    // Adicione mais conforme necessário
+  };
 
-        snapshot.forEach(doc => {
-          const log = doc.data();
-          const data = new Date(log.data?.toDate()).toLocaleString("pt-BR");
-          const item = document.createElement("div");
-          item.className = "log-item";
-          item.innerHTML = `<strong>${log.nome}</strong> da sala <strong>${log.sala}</strong> comprou <strong>${log.produto}</strong> em ${data}`;
-          logLista.appendChild(item);
-        });
-      });
+  db.collection("logs").orderBy("data", "desc").limit(20).onSnapshot(snapshot => {
+    logLista.innerHTML = '';
+    if (snapshot.empty) {
+      logLista.innerHTML = "<p>Nenhuma compra registrada.</p>";
+      return;
     }
+
+    snapshot.forEach(doc => {
+      const log = doc.data();
+      const data = new Date(log.data?.toDate()).toLocaleString("pt-BR");
+
+      const nomeProduto = nomesProdutos[log.produto] || log.produto;
+
+      const item = document.createElement("div");
+      item.className = "log-item";
+      item.innerHTML = `<strong>${log.nome}</strong> da sala <strong>${log.sala}</strong> comprou <strong>${nomeProduto}</strong> em ${data}`;
+      logLista.appendChild(item);
+    });
+  });
+}
   </script>
 </body>
 </html>
