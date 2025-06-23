@@ -172,10 +172,10 @@ function renderizarProdutos() {
       <img src="${info.imagem}" alt="${info.nome}"/>
       <p>
         ${produtosColetivos.includes(produtoId)
-          ? `Investimento da Sala: ${investimento}/${preco}<br>Estoque: ${estoque}`
+          ? `Investimento da Sala: ${investimento}/5000<br>Estoque: ${estoque}`
           : `Preço: ${preco} moedas<br>Estoque: ${estoque}`}
       </p>
-      <button onclick="comprarProduto('${produtoId}')">
+      <button ${moedas < preco && !produtosColetivos.includes(produtoId) ? "disabled" : ""} onclick="comprarProduto('${produtoId}')">
         ${produtosColetivos.includes(produtoId) ? "Investir" : "Comprar"}
       </button>
     `;
@@ -191,90 +191,11 @@ function comprarProduto(produtoId) {
     if (moedas <= 0) return alert("Você não tem moedas suficientes para investir.");
 
     const investimentoAtual = investimentosSala[produtoId] || 0;
-    const falta = preco - investimentoAtual;
-    if (falta <= 0) return alert("Este produto já foi comprado pela sala.");
+    const faltaPara5000 = 5000 - investimentoAtual;
 
-    const input = prompt(`Quanto você quer investir? (Falta ${falta} moedas para completar)`);
-    if (!input) return;
+    if (faltaPara5000 <= 0) return alert("Este produto coletivo já foi comprado pela sala.");
 
-    const valor = parseInt(input);
-    if (isNaN(valor) || valor <= 0) return alert("Valor inválido.");
-    if (valor > moedas) return alert("Você não tem moedas suficientes.");
-    if (valor > falta) return alert("Esse valor ultrapassa o necessário.");
-
-    const novoTotal = investimentoAtual + valor;
-
-    db.collection("salas").doc(userSala).update({
-      [`investimentos.${produtoId}`]: novoTotal
-    });
-
-    moedas -= valor;
-    investimentosSala[produtoId] = novoTotal;
-    document.getElementById("total-moedas").innerText = moedas;
-
-    db.collection("users").doc(userId).update({ moedas });
-
-    if (novoTotal >= preco) {
-      const estoqueAtual = estoqueGlobal[produtoId] || 0;
-      if (estoqueAtual > 0) {
-        estoqueGlobal[produtoId] = estoqueAtual - 1;
-        db.collection("loja").doc("config").update({
-          [`estoque.${produtoId}`]: estoqueGlobal[produtoId]
-        });
-        db.collection("salas").doc(userSala).update({
-          [`investimentos.${produtoId}`]: 0
-        });
-        db.collection("logs").add({
-          nome: userNome,
-          sala: userSala,
-          produto: produtoId,
-          data: firebase.firestore.Timestamp.now()
-        });
-        alert("Parabéns! A sala comprou o produto coletivo.");
-      } else {
-        alert("Produto esgotado.");
-      }
-    } else {
-      alert(`Você investiu ${valor} moedas com sucesso!`);
-    }
-
-    renderizarProdutos();
-  } else {
-    if (moedas < preco) return alert("Você não tem moedas suficientes.");
-    if ((estoqueGlobal[produtoId] || 0) <= 0) return alert("Produto esgotado.");
-
-    estoqueGlobal[produtoId]--;
-    moedas -= preco;
-
-    db.collection("users").doc(userId).update({ moedas });
-    db.collection("loja").doc("config").update({
-      [`estoque.${produtoId}`]: estoqueGlobal[produtoId]
-    });
-    db.collection("logs").add({
-      nome: userNome,
-      sala: userSala,
-      produto: produtoId,
-      data: firebase.firestore.Timestamp.now()
-    });
-
-    document.getElementById("total-moedas").innerText = moedas;
-    alert("Compra realizada com sucesso!");
-    renderizarProdutos();
-  }
-}
-
-  const preco = precosGlobal[produtoId] || 0;
-
-  if (produtosColetivos.includes(produtoId)) {
-    if (moedas <= 0) return alert("Você não tem moedas suficientes para investir.");
-
-    const investimentoAtual = investimentosSala[produtoId] || 0;
-    const precoProduto = precosGlobal[produtoId] || 5000;
-    const faltaParaCompletar = precoProduto - investimentoAtual;
-
-    if (faltaParaCompletar <= 0) return alert("Este produto coletivo já foi comprado pela sala.");
-
-    const input = prompt(`Quanto você quer investir? (Falta ${faltaParaCompletar} moedas para completar)`);
+    const input = prompt(`Quanto você quer investir?`);
 
     if (!input) return; // Cancelado
     const valorInvestido = parseInt(input);
@@ -287,7 +208,7 @@ function comprarProduto(produtoId) {
       return alert("Você não tem moedas suficientes.");
     }
 
-    if (valorInvestido > faltaParaCompletar) {
+    if (valorInvestido > faltaPara5000) {
       return alert("Esse valor ultrapassa o necessário para completar o investimento.");
     }
 
@@ -304,7 +225,7 @@ function comprarProduto(produtoId) {
 
     db.collection("users").doc(userId).update({ moedas });
 
-    if (novoTotal >= precoProduto) {
+    if (novoTotal >= 5000) {
       const estoqueAtual = estoqueGlobal[produtoId] || 0;
       if (estoqueAtual > 0) {
         estoqueGlobal[produtoId] = estoqueAtual - 1;
@@ -359,7 +280,6 @@ function comprarProduto(produtoId) {
     renderizarProdutos();
   }
 }
-
 
 
 function carregarRankingPeriodo(tipo, escopo) {
