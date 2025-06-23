@@ -191,13 +191,12 @@ function comprarProduto(produtoId) {
     if (moedas <= 0) return alert("Você não tem moedas suficientes para investir.");
 
     const investimentoAtual = investimentosSala[produtoId] || 0;
-    const precoProduto = precosGlobal[produtoId] || 5000; // valor dinâmico, default 5000
-const faltaParaCompletar = precoProduto - investimentoAtual;
+    const precoProduto = precosGlobal[produtoId] || 5000;
+    const faltaParaCompletar = precoProduto - investimentoAtual;
 
+    if (faltaParaCompletar <= 0) return alert("Este produto coletivo já foi comprado pela sala.");
 
-    if (faltaPara5000 <= 0) return alert("Este produto coletivo já foi comprado pela sala.");
-
-    const input = prompt(`Quanto você quer investir?`);
+    const input = prompt(`Quanto você quer investir? (Falta ${faltaParaCompletar} moedas para completar)`);
 
     if (!input) return; // Cancelado
     const valorInvestido = parseInt(input);
@@ -282,6 +281,7 @@ const faltaParaCompletar = precoProduto - investimentoAtual;
     renderizarProdutos();
   }
 }
+
 
 
 function carregarRankingPeriodo(tipo, escopo) {
