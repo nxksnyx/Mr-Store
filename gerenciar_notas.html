@@ -281,7 +281,7 @@ function carregarLogs() {
     // Adicione mais conforme necessário
   };
 
-  db.collection("logs").orderBy("data", "desc").limit(20).onSnapshot(snapshot => {
+  db.collection("logs").orderBy("data", "desc").onSnapshot(snapshot => {
     logLista.innerHTML = '';
     if (snapshot.empty) {
       logLista.innerHTML = "<p>Nenhuma compra registrada.</p>";
