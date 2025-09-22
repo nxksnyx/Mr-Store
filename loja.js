@@ -70,11 +70,44 @@ auth.onAuthStateChanged(user => {
       if (btnNotas) btnNotas.style.display = "inline-block";
     }
 
-    return Promise.all([
-      db.collection("loja").doc("config").get(),
-      db.collection("salas").doc(userSala).get(),
-      db.collection("users").where("sala", "==", userSala).get()
-    ]);
+// Escuta em tempo real as mudanças na loja/config
+db.collection("loja").doc("config").onSnapshot((lojaDoc) => {
+  if (lojaDoc.exists) {
+    const lojaData = lojaDoc.data();
+    estoqueGlobal = lojaData.estoque || {};
+    precosGlobal = lojaData.preco || {};
+    renderizarProdutos(); // redesenha produtos sempre que mudar
+  }
+});
+
+// Escuta em tempo real os investimentos da sala
+db.collection("salas").doc(userSala).onSnapshot((salaDoc) => {
+  if (salaDoc.exists) {
+    const salaData = salaDoc.data();
+    investimentosSala = salaData.investimentos || {};
+    renderizarProdutos(); // redesenha com novos investimentos
+  }
+});
+
+// Continua pegando os alunos uma vez (não precisa ser tempo real, só para médias)
+db.collection("users").where("sala", "==", userSala).get().then((alunosSnapshot) => {
+  let somas = [0, 0, 0, 0];
+  let cont = [0, 0, 0, 0];
+
+  alunosSnapshot.forEach(doc => {
+    const aluno = doc.data();
+    if (aluno.projeto1 != null) { somas[0] += aluno.projeto1; cont[0]++; }
+    if (aluno.projeto2 != null) { somas[1] += aluno.projeto2; cont[1]++; }
+    if (aluno.tecnologia != null) { somas[2] += aluno.tecnologia; cont[2]++; }
+    if (aluno.paulista != null) { somas[3] += aluno.paulista; cont[3]++; }
+  });
+
+  document.getElementById("media-projeto1").innerText = cont[0] ? (somas[0] / cont[0]).toFixed(1) : "-";
+  document.getElementById("media-projeto2").innerText = cont[1] ? (somas[1] / cont[1]).toFixed(1) : "-";
+  document.getElementById("media-tecnologia").innerText = cont[2] ? (somas[2] / cont[2]).toFixed(1) : "-";
+  document.getElementById("media-paulista").innerText = cont[3] ? (somas[3] / cont[3]).toFixed(1) : "-";
+});
+
   }).then(([lojaDoc, salaDoc, alunosSnapshot]) => {
     if (lojaDoc.exists) {
       const lojaData = lojaDoc.data();
