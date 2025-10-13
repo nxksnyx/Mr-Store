@@ -19,9 +19,7 @@
       align-items: center;
       color: white;
     }
-    .header {
-      text-align: center;
-    }
+    .header { text-align: center; }
     .form-container {
       background: rgba(0, 0, 0, 0.7);
       padding: 20px;
@@ -47,6 +45,14 @@
       font-weight: bold;
       margin-top: 10px;
     }
+    .switch {
+      margin-top: 10px;
+      color: #fff;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    #register-box { display: none; }
   </style>
 </head>
 <body>
@@ -55,14 +61,27 @@
     <img src="https://imgur.com/uuW1flJ.jpg" alt="Logo" width="150" />
   </div>
 
-  <div class="form-container">
+  <!-- Login -->
+  <div class="form-container" id="login-box">
     <h2>Login</h2>
     <input type="text" id="identificador" placeholder="RA ou E-mail" />
     <input type="password" id="senha" placeholder="Senha (se for e-mail)" />
     <button onclick="processarAuth()">Entrar</button>
+    <p class="switch" onclick="mostrarRegistro()">Criar uma conta</p>
   </div>
 
-  <!-- Firebase SDKs -->
+  <!-- Registro -->
+  <div class="form-container" id="register-box">
+    <h2>Criar Conta</h2>
+    <input type="text" id="nomeCadastro" placeholder="Nome completo" />
+    <input type="text" id="raCadastro" placeholder="RA (ex: 0001163879605)" />
+    <input type="email" id="emailCadastro" placeholder="E-mail (ex: exemplo@gmail.com)" />
+    <input type="password" id="senhaCadastro" placeholder="Senha" />
+    <button onclick="criarConta()">Cadastrar</button>
+    <p class="switch" onclick="mostrarLogin()">Já tem conta? Fazer login</p>
+  </div>
+
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
@@ -81,74 +100,85 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // 🔹 Função de login
+    // Alternar entre login e registro
+    function mostrarRegistro() {
+      document.getElementById("login-box").style.display = "none";
+      document.getElementById("register-box").style.display = "flex";
+    }
+    function mostrarLogin() {
+      document.getElementById("register-box").style.display = "none";
+      document.getElementById("login-box").style.display = "flex";
+    }
+
+    // 🔹 Login
     async function processarAuth() {
       const identificador = document.getElementById('identificador').value.trim().toLowerCase();
       const senha = document.getElementById('senha').value.trim();
 
-      if (!identificador) {
-        alert("Digite seu RA ou e-mail.");
-        return;
-      }
+      if (!identificador) return alert("Digite seu RA ou e-mail.");
 
-      // Verifica se é só número (RA)
       const isNumero = /^\d+$/.test(identificador);
 
       try {
-        // 🔸 Se for RA (só números)
         if (isNumero) {
-          const docRef = db.collection("usuariosSemSenha").doc(identificador);
-          const docSnap = await docRef.get();
-
-          if (docSnap.exists) {
+          const doc = await db.collection("usuariosSemSenha").doc(identificador).get();
+          if (doc.exists) {
             localStorage.setItem("usuarioLogado", identificador);
             window.location.href = "loja.html";
-            return;
           } else {
-            alert("RA não encontrado no sistema.");
-            return;
+            alert("RA não encontrado.");
           }
-        }
-
-        // 🔸 Se for admin
-        if (identificador === "sandrachefa@gmail.com") {
-          if (!senha) {
-            alert("Digite a senha da admin.");
-            return;
-          }
-
-          await auth.signInWithEmailAndPassword(identificador, senha);
-          localStorage.setItem("usuarioLogado", identificador);
-          window.location.href = "admin.html";
           return;
         }
 
-        // 🔸 Se for e-mail normal
-        if (identificador.includes("@")) {
-          if (!senha) {
-            alert("Digite a senha.");
-            return;
-          }
+        if (!senha) return alert("Digite a senha.");
 
-          await auth.signInWithEmailAndPassword(identificador, senha);
-          localStorage.setItem("usuarioLogado", identificador);
-          window.location.href = "loja.html";
-          return;
-        }
-
-        alert("Digite um e-mail válido ou RA numérico.");
+        const cred = await auth.signInWithEmailAndPassword(identificador, senha);
+        localStorage.setItem("usuarioLogado", cred.user.email);
+        window.location.href = "loja.html";
       } catch (err) {
-        console.error("Erro no login:", err);
         alert("Erro no login: " + err.message);
       }
     }
 
-    // 🔹 Pressionar Enter também faz login
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        processarAuth();
+    // 🔹 Criar Conta
+    async function criarConta() {
+      const nome = document.getElementById("nomeCadastro").value.trim();
+      const ra = document.getElementById("raCadastro").value.trim();
+      const email = document.getElementById("emailCadastro").value.trim().toLowerCase();
+      const senha = document.getElementById("senhaCadastro").value.trim();
+
+      if (!nome || !ra || !email || !senha) {
+        alert("Preencha todos os campos.");
+        return;
       }
-    });
+
+      try {
+        // Cria usuário no Firebase Auth
+        const cred = await auth.createUserWithEmailAndPassword(email, senha);
+        const uid = cred.user.uid;
+
+        // Adiciona no Firestore
+        await db.collection("users").doc(uid).set({
+          email: email,
+          nome: nome,
+          moedas: 80,
+          paulista: 6,
+          projeto1: 0,
+          projeto2: 5,
+          ra: ra,
+          sala: "6 A",
+          tecnologia: 5
+        });
+
+        alert("Conta criada com sucesso!");
+        localStorage.setItem("usuarioLogado", email);
+        window.location.href = "loja.html";
+      } catch (erro) {
+        console.error(erro);
+        alert("Erro ao criar conta: " + erro.message);
+      }
+    }
   </script>
 </body>
 </html>
