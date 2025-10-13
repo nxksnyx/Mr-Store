@@ -57,33 +57,10 @@
 
   <div class="form-container">
     <h2>Login</h2>
-    <input type="text" id="ra" placeholder="000 RA do aluno (com ou sem) digito" />
-    <input type="password" id="password" placeholder="Senha" />
+    <input type="text" id="identificador" placeholder="RA ou E-mail" />
+    <input type="password" id="senha" placeholder="Senha (se for e-mail)" />
     <button onclick="processarAuth()">Entrar</button>
   </div>
-
-  <script>
-  // Captura os campos
-  const raInput = document.getElementById("ra");
-  const passwordInput = document.getElementById("password");
-
-  // Adiciona o evento para quando pressionar uma tecla
-  [raInput, passwordInput].forEach(input => {
-    input.addEventListener("keydown", function(event) {
-      if (event.key === "Enter") {
-        event.preventDefault(); // Evita comportamento padrão
-        processarAuth(); // Chama a função de login
-      }
-    });
-  });
-
-  function processarAuth() {
-    const ra = raInput.value.trim();
-    const senha = passwordInput.value.trim();
-    alert("RA: " + ra + " | Senha: " + senha);
-    // aqui vai a lógica de autenticação
-  }
-</script>
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -91,6 +68,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
   <script>
+    // 🔧 Configuração Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBFiGU-blNt7XFO9cjYPoWaPP-c5EEItfc",
       authDomain: "mrstore-d429f.firebaseapp.com",
@@ -101,33 +79,76 @@
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    function processarAuth() {
-      const identificador = document.getElementById('ra').value.trim();
-      const password = document.getElementById('password').value;
+    // 🔹 Função de login
+    async function processarAuth() {
+      const identificador = document.getElementById('identificador').value.trim().toLowerCase();
+      const senha = document.getElementById('senha').value.trim();
 
-      if (!identificador || !password) {
-        alert("Preencha RA ou e-mail e a senha.");
+      if (!identificador) {
+        alert("Digite seu RA ou e-mail.");
         return;
       }
 
-      const isEmail = identificador.includes("@");
-      let emailFake;
+      // Verifica se é só número (RA)
+      const isNumero = /^\d+$/.test(identificador);
 
-      if (isEmail) {
-        if (identificador !== "sandrachefa@gmail.com") {
-          alert("Use seu RA.");
+      try {
+        // 🔸 Se for RA (só números)
+        if (isNumero) {
+          const docRef = db.collection("usuariosSemSenha").doc(identificador);
+          const docSnap = await docRef.get();
+
+          if (docSnap.exists) {
+            localStorage.setItem("usuarioLogado", identificador);
+            window.location.href = "loja.html";
+            return;
+          } else {
+            alert("RA não encontrado no sistema.");
+            return;
+          }
+        }
+
+        // 🔸 Se for admin
+        if (identificador === "sandrachefa@gmail.com") {
+          if (!senha) {
+            alert("Digite a senha da admin.");
+            return;
+          }
+
+          await auth.signInWithEmailAndPassword(identificador, senha);
+          localStorage.setItem("usuarioLogado", identificador);
+          window.location.href = "admin.html";
           return;
         }
-        emailFake = identificador;
-      } else {
-        emailFake = `${identificador}@ra.com`.toLowerCase();
-      }
 
-      auth.signInWithEmailAndPassword(emailFake, password)
-        .then(() => window.location.href = 'loja.html')
-        .catch(err => alert("Erro no login: " + err.message));
+        // 🔸 Se for e-mail normal
+        if (identificador.includes("@")) {
+          if (!senha) {
+            alert("Digite a senha.");
+            return;
+          }
+
+          await auth.signInWithEmailAndPassword(identificador, senha);
+          localStorage.setItem("usuarioLogado", identificador);
+          window.location.href = "loja.html";
+          return;
+        }
+
+        alert("Digite um e-mail válido ou RA numérico.");
+      } catch (err) {
+        console.error("Erro no login:", err);
+        alert("Erro no login: " + err.message);
+      }
     }
+
+    // 🔹 Pressionar Enter também faz login
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        processarAuth();
+      }
+    });
   </script>
 </body>
 </html>
