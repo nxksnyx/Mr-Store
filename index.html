@@ -144,11 +144,10 @@
     // 🔹 Criar Conta
     async function criarConta() {
       const nome = document.getElementById("nomeCadastro").value.trim();
-      const ra = document.getElementById("raCadastro").value.trim();
       const email = document.getElementById("emailCadastro").value.trim().toLowerCase();
       const senha = document.getElementById("senhaCadastro").value.trim();
 
-      if (!nome || !ra || !email || !senha) {
+      if (!nome || !email || !senha) {
         alert("Preencha todos os campos.");
         return;
       }
@@ -167,7 +166,7 @@
           projeto1: 0,
           projeto2: 5,
           ra: ra,
-          sala: "6 A",
+          sala: "",
           tecnologia: 5
         });
 
