@@ -35,7 +35,6 @@ const produtosInfo = {
   kit_doces: { nome: "Kit doces", imagem: "https://i.imgur.com/rpIGmVB.jpeg" },
   fini: { nome: "Fini", imagem: "https://i.imgur.com/8Nwj3tF.jpeg" },
   pipoca: { nome: "Pipoca Doce", imagem: "https://i.imgur.com/3mn1jWo.jpeg" },
-  jogos_virtuais: { nome: "Aula com Jogos Virtuais", imagem: "https://img.freepik.com/fotos-gratis/criancas-da-escola-usando-tablet-digital-em-sala-de-aula_107420-57955.jpg" },
   harry_potter: { nome: "Harry Potter e a Ordem da Fênix", imagem: "https://i.imgur.com/u39XPhX.jpeg" },
   narizinho: { nome: "Reinações de Narizinho", imagem: "https://i.imgur.com/XKfNUFl.jpeg" },
 };
