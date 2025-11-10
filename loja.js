@@ -26,11 +26,6 @@ const produtosColetivos = [
 ];
 
 const produtosInfo = {
-  aula_jogos: { nome: "Aula com jogos e brincadeiras na área externa", imagem: "https://i.imgur.com/rRKueT4.jpeg" },
-  aula_ping: { nome: "Aula com jogos e brincadeiras no pátio", imagem: "https://i.imgur.com/o48S1TL.jpeg" },
-  aula_fisica: { nome: "Aula extra de educação física", imagem: "https://jundiai.sp.gov.br/noticias/wp-content/uploads/sites/32/2018/11/emeb_marcos_gasparian-166.jpg" },
-  aula_cinema: { nome: "Aula de Cinema com Pipoca na sala", imagem: "https://2.bp.blogspot.com/-goes4lu3wsQ/VTl7mzY2lpI/AAAAAAAAGR0/By2X6yTVvZk/s1600/crian%C3%A7as-filmes.jpg" },
-  aula_horta: { nome: "Aula na Horta", imagem: "https://i.imgur.com/EDqWAVf.jpeg" },
   teclado_mouse: { nome: "Teclado e Mouse Maxtro", imagem: "https://i.imgur.com/UBqi1ni.jpeg" },
   mouse_gamer: { nome: "Mouse Gamer", imagem: "https://i.imgur.com/kpcOYTX.jpeg" },
   kit_bobbie: { nome: "Kit copo bobbie goods e lápis de cor", imagem: "https://i.imgur.com/THsU3gP.jpeg" },
