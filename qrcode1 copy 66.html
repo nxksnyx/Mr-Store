@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Conta de Acesso</title>
+<title>Parabéns!</title>
 <style>
   body {
     margin: 0;
@@ -14,95 +14,61 @@
     align-items: center;
     justify-content: center;
     height: 100vh;
+    overflow: hidden;
   }
+
   .card {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
-    padding: 30px;
-    width: 320px;
+    padding: 40px 30px;
     text-align: center;
     box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    animation: aparecer 1s ease-out forwards;
   }
+
+  @keyframes aparecer {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   h1 {
-    margin-top: 0;
-    font-size: 22px;
+    font-size: 26px;
     color: #6ee7b7;
+    margin-bottom: 10px;
   }
-  .info {
-    margin: 18px 0;
-    background: rgba(255,255,255,0.07);
-    border-radius: 10px;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+
+  p {
+    font-size: 18px;
+    color: #cbd5e1;
   }
-  .info span {
-    font-weight: 500;
+
+  .valor {
+    font-size: 28px;
+    color: #3b82f6;
+    font-weight: 700;
+    margin-top: 12px;
+    animation: brilho 1.5s infinite alternate;
   }
-  button {
-    background: linear-gradient(90deg, #6ee7b7, #3b82f6);
-    border: none;
-    color: #0b1220;
-    font-weight: 600;
-    padding: 6px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
+
+  @keyframes brilho {
+    from { text-shadow: 0 0 6px #3b82f6; }
+    to { text-shadow: 0 0 16px #6ee7b7; }
   }
-  button:hover {
-    opacity: 0.9;
-  }
-  .qr {
-    margin-top: 25px;
-    background: white;
-    border-radius: 10px;
-    padding: 8px;
-    display: inline-block;
-  }
+
   footer {
-    margin-top: 15px;
-    font-size: 12px;
+    margin-top: 20px;
+    font-size: 13px;
     color: #9aa6b2;
   }
 </style>
 </head>
 <body>
   <div class="card">
-    <h1>Conta de Acesso</h1>
-
-    <div class="info">
-      <span id="user">Mrstore66@gmail.com</span>
-      <button onclick="copiar('user')">Copiar</button>
-    </div>
-
-    <div class="info">
-      <span id="pass">Mr12345@</span>
-      <button onclick="copiar('pass')">Copiar</button>
-    </div>
-
-
-    <footer>Toque em copiar para salvar os dados</footer>
+    <h1>🎉 Parabéns! 🎉</h1>
+    <p>Você ganhou:</p>
+    <div class="valor">100 MrCoins</div>
+    <footer>Use seu prêmio agora na MrStore!</footer>
   </div>
-
-  <script>
-    const usuario = "usuario123";
-    const senha = "senha456";
-
-    // gera QR com as infos (você pode mudar o conteúdo do QR aqui)
-    const qrTexto = `Usuário: ${usuario}\nSenha: ${senha}`;
-    document.getElementById("qrimg").src = 
-      `https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=${encodeURIComponent(qrTexto)}`;
-
-    function copiar(id) {
-      const texto = document.getElementById(id).innerText;
-      navigator.clipboard.writeText(texto).then(() => {
-        const botao = event.target;
-        botao.textContent = "Copiado!";
-        setTimeout(() => botao.textContent = "Copiar", 1500);
-      });
-    }
-  </script>
 </body>
 </html>
