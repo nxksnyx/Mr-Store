@@ -64,8 +64,7 @@
   <!-- Login -->
   <div class="form-container" id="login-box">
     <h2>Login</h2>
-    <input type="text" id="identificador" placeholder="RA ou E-mail" />
-    <input type="password" id="senha" placeholder="Senha (se for e-mail)" />
+    <input type="text" id="identificador" placeholder="Digite seu RA" />
     <button onclick="processarAuth()">Entrar</button>
     <p class="switch" onclick="mostrarRegistro()">Criar uma conta</p>
   </div>
@@ -74,8 +73,9 @@
   <div class="form-container" id="register-box">
     <h2>Criar Conta</h2>
     <input type="text" id="nomeCadastro" placeholder="Nome completo" />
-    <input type="email" id="emailCadastro" placeholder="E-mail (ex: exemplo@gmail.com)" />
-    <input type="password" id="senhaCadastro" placeholder="Senha" />
+    <input type="text" id="raCadastro" placeholder="RA (ex: 0001163879605)" />
+    <input type="email" id="emailCadastro" placeholder="Email técnico (ex: 0001163879605@ra.com)" />
+    <input type="password" id="senhaCadastro" placeholder="Senha (obrigatória só pro Firebase)" />
     <button onclick="criarConta()">Cadastrar</button>
     <p class="switch" onclick="mostrarLogin()">Já tem conta? Fazer login</p>
   </div>
@@ -85,98 +85,95 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-  <script>
-    // 🔧 Configuração Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyBFiGU-blNt7XFO9cjYPoWaPP-c5EEItfc",
-      authDomain: "mrstore-d429f.firebaseapp.com",
-      projectId: "mrstore-d429f",
-      storageBucket: "mrstore-d429f.appspot.com",
-      messagingSenderId: "310913725702",
-      appId: "1:310913725702:web:22775b2fa034b0697e1a87"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+<script>
+  // Config Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyBFiGU-blNt7XFO9cjYPoWaPP-c5EEItfc",
+    authDomain: "mrstore-d429f.firebaseapp.com",
+    projectId: "mrstore-d429f",
+    storageBucket: "mrstore-d429f.appspot.com",
+    messagingSenderId: "310913725702",
+    appId: "1:310913725702:web:22775b2fa034b0697e1a87"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
-    // Alternar entre login e registro
-    function mostrarRegistro() {
-      document.getElementById("login-box").style.display = "none";
-      document.getElementById("register-box").style.display = "flex";
-    }
-    function mostrarLogin() {
-      document.getElementById("register-box").style.display = "none";
-      document.getElementById("login-box").style.display = "flex";
-    }
+  // Alternância login/registro
+  function mostrarRegistro() {
+    document.getElementById("login-box").style.display = "none";
+    document.getElementById("register-box").style.display = "flex";
+  }
+  function mostrarLogin() {
+    document.getElementById("register-box").style.display = "none";
+    document.getElementById("login-box").style.display = "flex";
+  }
 
-    // 🔹 Login
-    async function processarAuth() {
-      const identificador = document.getElementById('identificador').value.trim().toLowerCase();
-      const senha = document.getElementById('senha').value.trim();
+  // LOGIN (APENAS RA, SEM SENHA)
+  async function processarAuth() {
+    const ra = document.getElementById('identificador').value.trim();
 
-      if (!identificador) return alert("Digite seu RA ou e-mail.");
-
-      const isNumero = /^\d+$/.test(identificador);
-
-      try {
-        if (isNumero) {
-          const doc = await db.collection("usuariosSemSenha").doc(identificador).get();
-          if (doc.exists) {
-            localStorage.setItem("usuarioLogado", identificador);
-            window.location.href = "loja.html";
-          } else {
-            alert("RA não encontrado.");
-          }
-          return;
-        }
-
-        if (!senha) return alert("Digite a senha.");
-
-        const cred = await auth.signInWithEmailAndPassword(identificador, senha);
-        localStorage.setItem("usuarioLogado", cred.user.email);
-        window.location.href = "loja.html";
-      } catch (err) {
-        alert("Erro no login: " + err.message);
-      }
+    if (!ra) {
+      alert("Digite seu RA.");
+      return;
     }
 
-    // 🔹 Criar Conta
-    async function criarConta() {
-      const nome = document.getElementById("nomeCadastro").value.trim();
-      const email = document.getElementById("emailCadastro").value.trim().toLowerCase();
-      const senha = document.getElementById("senhaCadastro").value.trim();
+    try {
+      // Busca usuário pelo RA na coleção "users"
+      const query = await db.collection("users").where("ra", "==", ra).get();
 
-      if (!nome || !email || !senha) {
-        alert("Preencha todos os campos.");
+      if (query.empty) {
+        alert("RA não encontrado.");
         return;
       }
 
-      try {
-        // Cria usuário no Firebase Auth
-        const cred = await auth.createUserWithEmailAndPassword(email, senha);
-        const uid = cred.user.uid;
+      // Login bem sucedido
+      localStorage.setItem("usuarioLogado", ra);
+      window.location.href = "loja.html";
 
-        // Adiciona no Firestore
-        await db.collection("users").doc(uid).set({
-          email: email,
-          nome: nome,
-          moedas: 80,
-          paulista: 6,
-          projeto1: 0,
-          projeto2: 5,
-          ra: ra,
-          sala: "",
-          tecnologia: 5
-        });
-
-        alert("Conta criada com sucesso!");
-        localStorage.setItem("usuarioLogado", email);
-        window.location.href = "loja.html";
-      } catch (erro) {
-        console.error(erro);
-        alert("Erro ao criar conta: " + erro.message);
-      }
+    } catch (erro) {
+      console.error(erro);
+      alert("Erro ao fazer login.");
     }
-  </script>
+  }
+
+  // REGISTRO (RA REAL, SENHA SÓ PRO FIREBASE)
+  async function criarConta() {
+    const nome = document.getElementById("nomeCadastro").value.trim();
+    const ra = document.getElementById("raCadastro").value.trim();
+    const email = document.getElementById("emailCadastro").value.trim();
+    const senha = document.getElementById("senhaCadastro").value.trim();
+
+    if (!nome || !ra || !email || !senha) {
+      alert("Preencha todos os campos.");
+      return;
+    }
+
+    try {
+      const cred = await auth.createUserWithEmailAndPassword(email, senha);
+      const uid = cred.user.uid;
+
+      await db.collection("users").doc(uid).set({
+        email: email,
+        nome: nome,
+        moedas: 80,
+        paulista: 6,
+        projeto1: 0,
+        projeto2: 5,
+        ra: ra,
+        sala: "",
+        tecnologia: 5
+      });
+
+      alert("Conta criada com sucesso!");
+      localStorage.setItem("usuarioLogado", ra);
+      window.location.href = "loja.html";
+
+    } catch (erro) {
+      console.error(erro);
+      alert("Erro ao criar conta: " + erro.message);
+    }
+  }
+</script>
 </body>
 </html>
