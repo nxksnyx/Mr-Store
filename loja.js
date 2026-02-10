@@ -72,6 +72,14 @@ db.collection("users").where("ra", "==", raLogado).get().then(snapshot => {
   moedas = data.moedas || 0;
   userSala = data.sala || null;
 
+  const nomeUsuarioEl = document.getElementById("nome-usuario");
+  if (nomeUsuarioEl) nomeUsuarioEl.innerText = userNome;
+
+  const gerenciarBtn = document.getElementById("btn-gerenciar-notas");
+  if (gerenciarBtn && userEmail === "sandrachefa@gmail.com") {
+    gerenciarBtn.style.display = "inline-block";
+  }
+
   document.getElementById("total-moedas").innerText = moedas;
   document.getElementById("nota-projeto1").innerText = data.projeto1 ?? "-";
   document.getElementById("nota-projeto2").innerText = data.projeto2 ?? "-";
@@ -141,6 +149,10 @@ function iniciarLoja() {
 function logout() {
   localStorage.removeItem("usuarioLogado");
   window.location.href = "index.html";
+}
+
+function irParaGerenciarNotas() {
+  window.location.href = "gerenciar_notas.html";
 }
 
 
